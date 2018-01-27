@@ -36,7 +36,7 @@ class OK_MAKER:
 
     def send_price(self,symbol,buy,sell):
 
-        if sell - buy > 1:
+        if sell - buy > 0.5:
             buy_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KD'],price=buy + 0.005, amount=self._params['amount'],match_price=0)
             sell_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KK'],price=sell - 0.005, amount=self._params['amount'],match_price=0)
         else:
