@@ -19,7 +19,6 @@ class Ok_Services:
             OK_PARAMS['SECRET_KEY'] = os.environ['SECRET_KEY']
         self.utils = OK_Utils(OK_PARAMS)
 
-
     def get_accounts(self):
         pass
 
@@ -610,7 +609,6 @@ if __name__ == '__main__':
     result = ok.get_future_trades('eth_usdt')
     print(result)
     '''#7 get_future_trades 获取OKex合约成交信息
-
 
     '''#8 get_future_index 获取OKex合约指数信息
     result = ok.get_future_index('eth_usdt')
