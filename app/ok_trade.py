@@ -434,7 +434,7 @@ if __name__ == '__main__':
     params ={'dif':1.5}
     params ={'m5m10':0.2}
     params ={'risk_rate':0.5}
-    params ={'amount':5}
+    params ={'amount':10}
 
     ok_maker = OK_MAKER(params)
     symbol = 'eth_usdt'
