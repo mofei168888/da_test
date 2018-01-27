@@ -408,9 +408,9 @@ class OK_MAKER:
         orders = {}
         if user_pos['status']:
             wt_order = self.get_wt_orders(symbol)
-            if user_pos['buy_amount']==0 :#没有做多持仓，并且没有做多委托订单
-                if OK_ORDER_TYPE['KD'] in wt_order['type_list']:#将委托订单撤销，并重新下单
-                    print(wt_order)
+            if user_pos['buy_amount']==0 and OK_ORDER_TYPE['KD'] in wt_order['type_list']:#没有做多持仓，并且没有做多委托订单
+                #if OK_ORDER_TYPE['KD'] in wt_order['type_list']:#将委托订单撤销，并重新下单
+                    #print(wt_order)
 
                 buy_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
                                                               match_price=0, price=price[0]+0.005,
