@@ -405,7 +405,7 @@ class OK_MAKER:
         user_pos = self.get_user_position(symbol)
         orders = {}
         if user_pos['status']:
-            if user_pos['buy_amount']==0 or user_pos['buy_amount']==0:#没有做多持仓,没有做空持仓
+            if user_pos['buy_amount']==0 and user_pos['buy_amount']==0:#没有做多持仓,没有做空持仓
                 order_list = self.send_price(symbol, price[0], price[1])
                 orders = order_list
             if user_pos['buy_amount'] >0:#拥有做多净头寸,处理掉做多净头寸
