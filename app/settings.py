@@ -13,8 +13,8 @@ ORDER_TYPE={'BL':'buy-limit',
             'SM':'sell-market'}
 
 OK_PARAMS={
-    'api_key':'',
-    'SECRET_KEY':'',
+    'api_key':'52475250-e0ee-46b5-a767-33434f0203d5',
+    'SECRET_KEY':'36563735314A17AB0356625F90EE5EBD',
     'URL':'https://www.okex.com/api/v1/',
     'ETH_ADDRESS':'0xecae55307a0e5c855d518dc3c2065f733fd0b6bc'
 }

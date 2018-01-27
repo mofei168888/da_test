@@ -18,7 +18,6 @@ class Ok_Services:
         if 'SECRET_KEY' in os.environ:
             OK_PARAMS['SECRET_KEY'] = os.environ['SECRET_KEY']
         self.utils = OK_Utils(OK_PARAMS)
-        print(self.utils.params)
 
 
     def get_accounts(self):

@@ -37,10 +37,11 @@ class OK_MAKER:
     def send_price(self,symbol,buy,sell):
 
         if sell - buy > 1:
-            buy_order = self._OKServices.send_future_order(symbol, OK_ORDER_TYPE['KD'], buy + 0.001, 0.001)
-            sell_order = self._OKServices.send_future_order(symbol, OK_ORDER_TYPE['KK'], sell - 0.001, 0.001)
+            buy_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KD'],price=buy + 0.005, amount=5,match_price=0)
+            sell_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KK'],price=sell - 0.005, amount=5,match_price=0)
         else:
-            buy_order,sell_order=[]
+            buy_order={}
+            sell_order={}
 
         return buy_order,sell_order
 
@@ -81,7 +82,7 @@ class OK_MAKER:
         result={}
         result['status']=False
         hold = self._OKServices.get_future_position(symbol,contract_type)
-        print(hold)
+        #print(hold)
         if hold:
             result['buy_amount'] = hold['holding'][0]['buy_amount']
             result['buy_available']=hold['holding'][0]['buy_available']
@@ -124,8 +125,8 @@ class OK_MAKER:
                 ma['ma5'] = round(sum_5/5,4)
                 ma['ma10'] = round(sum_10/10,4)
                 ma['ma15'] = round(sum_15/15,4)
-                ma['ma30'] = round(sum_15 / 30, 4)
-                ma['ma60'] = round(sum_15 / 60, 4)
+                ma['ma30'] = round(sum_30/ 30, 4)
+                ma['ma60'] = round(sum_60/ 60, 4)
                 data['status'] = True
                 data['data'] = ma
         except Exception as e:
@@ -138,11 +139,12 @@ class OK_MAKER:
         result = ok_maker.get_ma_data(symbol, period,size) #获取均线数据
         if result['status']:
 
-            if result['data']['price']>result['data']['ma10']:
+            if result['data']['price']>result['data']['ma5']:
                 result['signal'] = 1
 
-            if result['data']['price']<result['data']['ma10']:
+            if result['data']['price']<result['data']['ma5']:
                 result['signal'] = -1
+
 
             '''
             if  result['data']['price']>result['data']['ma5'] and result['data']['ma5'] < result['data']['ma10']<result['data']['ma15']:#价格上出现变盘信号
@@ -314,11 +316,11 @@ class OK_MAKER:
             if signal['signal'] == 1:#买入
                 if user_pos['buy_amount'] == 0 and OK_ORDER_TYPE['KD'] not in wt_orders['type_list']:
                     buy_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
-                                                                   match_price=0, price=signal['data']['ma10']-0.5,
+                                                                   match_price=0, price=signal['data']['ma5']-0.5,
                                                                    amount=self._params['amount'])  # 挂单在10日均线上
                     if buy_order:
                         order_info = buy_order
-                        print('多头已下单(市价):%s' % buy_order)
+                        print('多头已下单(挂单):%s' % buy_order)
             elif signal['signal'] == 2:  # 表示做多信号
                 if user_pos['buy_amount'] == 0 and OK_ORDER_TYPE['KD'] not in wt_orders['type_list']:  # 表示当前没有持仓,并且没有买入委托订单
                     buy_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
@@ -339,11 +341,11 @@ class OK_MAKER:
             elif signal['signal'] == -1:
                 if user_pos['sell_amount'] == 0 and OK_ORDER_TYPE['KK'] not in wt_orders['type_list']:
                     sell_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KK'],
-                                                                    match_price=0, price=signal['data']['ma10']+0.5,
+                                                                    match_price=0, price=signal['data']['ma5']+0.5,
                                                                     amount=self._params['amount'])  # 挂单在5日均线上
                     if sell_order:
                         order_info = sell_order
-                        print('空头已下单(市价):%s' % sell_order)
+                        print('空头已下单(挂单):%s' % sell_order)
             elif signal['signal'] == -2:  # 表示做空信号
                 if user_pos['sell_amount'] == 0 and OK_ORDER_TYPE['KK'] not in wt_orders['type_list']:  # 表示没有空头持仓，执行做空操作
                     sell_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KK'],
@@ -362,32 +364,85 @@ class OK_MAKER:
                         print('空头已下单(市价):%s' % sell_order)
 
         return order_info
+
+    def get_profit(self,symbol,signal):
+        user_pos = self.get_user_position(symbol)
+
+        if user_pos['buy_amount'] == 0 and  signal['price']-user_pos['buy_cost'] >5:#拥有买盘持仓
+            pd_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
+                                                           match_price=1, price=signal['data']['ma5'] - 0.5,
+                                                           amount=self._params['amount'])  # 挂单在10日均线上
+            if pd_order:
+                order_info = pd_order
+                print('多头已下单(挂单):%s' % pd_order)
+
+        if user_pos['sell_amount'] == 0 and  user_pos['sell_cost'] - signal['price']>5:
+            sell_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
+                                                            match_price=1, price=signal['data']['ma5'] - 0.5,
+                                                            amount=self._params['amount'])  # 挂单在10日均线上
+            if sell_order:
+                order_info = sell_order
+                print('多头已下单(挂单):%s' % sell_order)
+
     def trade_system(self,symbol,period='1min',size = 60,contract_type='this_week'):
 
         return_data = {}
         signal = self.get_trade_signal(symbol, period, size, contract_type)  # 获取行情交易信号
         if signal['status']:#获取到交易信号
-            #pc_order = self.send_pc_orders(symbol, signal)  #处理平仓
-            #if pc_order:
-                #print("平仓订单:%s"%pc_order)
-            #kc_order = self.send_kc_orders(symbol, signal)  #处理开仓#
-            #if kc_order:
-                #print("平仓订单:%s"%kc_order)
+            pc_order = self.send_pc_orders(symbol, signal)  #处理平仓
+            if pc_order:
+                print("平仓订单:%s"%pc_order)
+            kc_order = self.send_kc_orders(symbol, signal)  #处理开仓#
+            if kc_order:
+                print("开仓订单:%s"%kc_order)
 
             print(signal)
 
         return return_data
 
+    def night_trade(self,symbol,period='1min',size = 60,contract_type='this_week'):
+        price = self.get_price_depth(symbol)
+        user_pos = self.get_user_position(symbol)
+        orders = {}
+        if user_pos['status']:
+            if user_pos['buy_amount']==0 and user_pos['buy_amount']==0:#没有做多持仓,没有做空持仓
+                order_list = self.send_price(symbol, price[0], price[1])
+                orders = order_list
+            if user_pos['buy_amount'] >0:#拥有做多净头寸,处理掉做多净头寸
+                if user_pos['buy_available']>0:
+                    pd_price = max(user_pos['buy_cost']+5,price[1]-0.05)
+                    pd_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
+                                                                  match_price=0, price=pd_price,
+                                                                  amount=user_pos['buy_available'])
+                    if pd_order:
+                        orders = pd_order
+                        print('执行多头止损(挂单)：%s' % pd_order)
+            if user_pos['sell_amount']>0:#拥有做空净头寸，处理掉做多净头寸  sell_available
+                if user_pos['sell_available'] > 0:
+                    pk_price = min(user_pos['sell_cost'] - 5, price[0] + 0.05)
+                    pk_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
+                                                                  match_price=0, price=pk_price,
+                                                                  amount=user_pos['sell_available'])
+                    if pk_order:
+                        orders = pk_order
+                        print('执行空头止损(挂单)：%s' % pk_order)
+
+
+        return orders
+
 if __name__ == '__main__':
     params ={'dif':1.5}
     params ={'m5m10':0.2}
     params ={'risk_rate':0.5}
-    params ={'amount':2}
+    params ={'amount':1}
 
     ok_maker = OK_MAKER(params)
     symbol = 'eth_usdt'
     while True:
-        ok_maker.trade_system(symbol,'5min')
+        try:
+            result=ok_maker.night_trade(symbol)
+        except Exception as e:
+            print('发生异常:%s'%e)
 
 
 
