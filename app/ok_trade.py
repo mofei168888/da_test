@@ -410,7 +410,7 @@ class OK_MAKER:
                 orders = order_list
             if user_pos['buy_amount'] >0:#拥有做多净头寸,处理掉做多净头寸
                 if user_pos['buy_available']>0:
-                    pd_price = max(user_pos['buy_cost']+0.5,price[1]-0.05)
+                    pd_price = max(user_pos['buy_cost']+1,price[1]-0.05)
                     pd_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
                                                                   match_price=0, price=pd_price,
                                                                   amount=user_pos['buy_available'])
@@ -419,7 +419,7 @@ class OK_MAKER:
                         print('执行多头止损(挂单)：%s' % pd_order)
             if user_pos['sell_amount']>0:#拥有做空净头寸，处理掉做多净头寸  sell_available
                 if user_pos['sell_available'] > 0:
-                    pk_price = min(user_pos['sell_cost'] - 0.5, price[0] + 0.05)
+                    pk_price = min(user_pos['sell_cost'] - 1, price[0] + 0.05)
                     pk_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
                                                                   match_price=0, price=pk_price,
                                                                   amount=user_pos['sell_available'])
