@@ -37,8 +37,8 @@ class OK_MAKER:
     def send_price(self,symbol,buy,sell):
 
         if sell - buy > 1:
-            buy_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KD'],price=buy + 0.005, amount=5,match_price=0)
-            sell_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KK'],price=sell - 0.005, amount=5,match_price=0)
+            buy_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KD'],price=buy + 0.005, amount=self._params['amount'],match_price=0)
+            sell_order = self._OKServices.send_future_order(symbol=symbol,type=OK_ORDER_TYPE['KK'],price=sell - 0.005, amount=self._params['amount'],match_price=0)
         else:
             buy_order={}
             sell_order={}
@@ -434,7 +434,7 @@ if __name__ == '__main__':
     params ={'dif':1.5}
     params ={'m5m10':0.2}
     params ={'risk_rate':0.5}
-    params ={'amount':1}
+    params ={'amount':5}
 
     ok_maker = OK_MAKER(params)
     symbol = 'eth_usdt'
