@@ -405,9 +405,23 @@ class OK_MAKER:
         user_pos = self.get_user_position(symbol)
         orders = {}
         if user_pos['status']:
-            if user_pos['buy_amount']==0 and user_pos['buy_amount']==0:#没有做多持仓,没有做空持仓
-                order_list = self.send_price(symbol, price[0], price[1])
-                orders = order_list
+            wt_order = self.get_wt_orders(symbol)
+            if user_pos['buy_amount']==0 and OK_ORDER_TYPE['KD'] not in wt_order['type_list']:#没有做多持仓，并且没有做多委托订单
+                buy_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
+                                                              match_price=0, price=price[0]+0.005,
+                                                              amount=self._params['amount'])
+                if buy_order:
+                    orders = buy_order
+                    print('做多订单已下单(挂单)：%s' % buy_order)
+
+            if user_pos['sell_amount']==0 and OK_ORDER_TYPE['KK'] not in wt_order['type_list']:#没有做空持仓，并且没有做空委托订单
+                sell_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
+                                                               match_price=0, price=price[1] - 0.005,
+                                                               amount=self._params['amount'])
+                if sell_order:
+                    orders = sell_order
+                    print('做空订单已下单(挂单)：%s' % sell_order)
+
             if user_pos['buy_amount'] >0:#拥有做多净头寸,处理掉做多净头寸
                 if user_pos['buy_available']>0:
                     pd_price = max(user_pos['buy_cost']+1,price[1]-0.05)
