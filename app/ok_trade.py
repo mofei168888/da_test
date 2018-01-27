@@ -457,8 +457,8 @@ if __name__ == '__main__':
 
     ok_maker = OK_MAKER(params)
     symbol = 'eth_usdt'
-    #while True:
-        #result=ok_maker.night_trade(symbol)
+    while True:
+        result=ok_maker.night_trade(symbol)
 
 
 
