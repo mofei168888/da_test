@@ -13,6 +13,7 @@ class OK_MAKER:
     def __init__(self,params):
         self._params = params
         self._OKServices = Ok_Services()
+        self._price={'buy':0.0000,'sell':0.0000}
 
     def get_price_depth(self,symbol):
         '''
@@ -206,6 +207,7 @@ class OK_MAKER:
         return_data={}
         wt_type = []
         wt_orders = self._OKServices.get_future_order(symbol=symbol, order_id=-1)
+        print(wt_orders)
         if wt_orders:
             for order in wt_orders['orders']:
                 wt_type.append(order['type'])
@@ -406,7 +408,10 @@ class OK_MAKER:
         orders = {}
         if user_pos['status']:
             wt_order = self.get_wt_orders(symbol)
-            if user_pos['buy_amount']==0 and OK_ORDER_TYPE['KD'] not in wt_order['type_list']:#没有做多持仓，并且没有做多委托订单
+            if user_pos['buy_amount']==0 :#没有做多持仓，并且没有做多委托订单
+                if OK_ORDER_TYPE['KD'] in wt_order['type_list']:#将委托订单撤销，并重新下单
+                    print(wt_order)
+
                 buy_order = self._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
                                                               match_price=0, price=price[0]+0.005,
                                                               amount=self._params['amount'])
@@ -452,11 +457,8 @@ if __name__ == '__main__':
 
     ok_maker = OK_MAKER(params)
     symbol = 'eth_usdt'
-    while True:
-        try:
-            result=ok_maker.night_trade(symbol)
-        except Exception as e:
-            print('发生异常:%s'%e)
+    #while True:
+        #result=ok_maker.night_trade(symbol)
 
 
 

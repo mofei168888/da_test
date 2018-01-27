@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import platform
+
 try:
     from app.OK_Utils import *
 except Exception as e:
@@ -11,14 +13,25 @@ except Exception as e:
 class Ok_Services:
 
     def __init__(self):
+        # Windows will be : Windows
+        # Linux will be : Linux
+        if platform.system() =='Windows':
+            fdc = open('D:\config\config.ini', 'r')
+            lines = fdc.readlines()
+            for line in lines:
+                index, value = line.split(':')
+                OK_PARAMS[index] = value.strip()
+            fdc.close()
+        if platform.system() == 'Linux':
+            fdc = open('/home/config.ini', 'r')
+            lines = fdc.readlines()
+            for line in lines:
+                index, value = line.split(':')
+                OK_PARAMS[index] = value.strip()
+            fdc.close()
 
-        #为了账户的安全性，API_KEY和SECRET_KEY取环境变量的值
-        if 'API_KEY' in os.environ:
-            OK_PARAMS['api_key'] = os.environ['API_KEY']
-        if 'SECRET_KEY' in os.environ:
-            OK_PARAMS['SECRET_KEY'] = os.environ['SECRET_KEY']
         self.utils = OK_Utils(OK_PARAMS)
-
+        print(self.utils.params)
     def get_accounts(self):
         pass
 

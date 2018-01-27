@@ -13,7 +13,7 @@ ORDER_TYPE={'BL':'buy-limit',
             'SM':'sell-market'}
 
 OK_PARAMS={
-    'api_key':'',
+    'API_KEY':'',
     'SECRET_KEY':'',
     'URL':'https://www.okex.com/api/v1/',
 }
