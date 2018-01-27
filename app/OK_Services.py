@@ -31,7 +31,6 @@ class Ok_Services:
             fdc.close()
 
         self.utils = OK_Utils(OK_PARAMS)
-        print(self.utils.params)
     def get_accounts(self):
         pass
 
