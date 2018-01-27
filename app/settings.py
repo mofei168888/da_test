@@ -16,7 +16,6 @@ OK_PARAMS={
     'api_key':'',
     'SECRET_KEY':'',
     'URL':'https://www.okex.com/api/v1/',
-    'ETH_ADDRESS':'0xecae55307a0e5c855d518dc3c2065f733fd0b6bc'
 }
 
 OK_ORDER_TYPE={'KD':1,
