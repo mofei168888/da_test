@@ -65,7 +65,7 @@ class Trade_Strategy:
                         print('做多订单已下单(市价)：%s' % buy_order)
             if signal ==-2:#做空交易信号
                 if user_pos['sell_amount'] == 0 :  # 没有做空持仓
-                    sell_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
+                    sell_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KK'],
                                                                             match_price=1, price=0.005,
                                                                             amount=self._trader._params['amount'])
                     if sell_order:
@@ -82,17 +82,17 @@ class Trade_Strategy:
             #print('交易信号:%s'%signal)
             if signal==1:#将做多持仓平仓
                 if user_pos['buy_amount'] > 0:
-                    pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
+                    pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
                                                                            match_price=1, price=0.005,
-                                                                           amount=self._trader._params['amount'])
+                                                                           amount=user_pos['buy_available'])
                     if pd_order:
                         orders = pd_order
                         print('做多订单已下单(市价)：%s' % pd_order)
             if signal==-1:#将做空持仓平仓
                 if user_pos['sell_amount'] > 0:
-                    pk_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
+                    pk_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
                                                                           match_price=1, price=0.005,
-                                                                          amount=self._trader._params['amount'])
+                                                                          amount=user_pos['sell_available'])
                     if pk_order:
                         orders = pk_order
                         print('做多订单已下单(市价)：%s' % pk_order)
