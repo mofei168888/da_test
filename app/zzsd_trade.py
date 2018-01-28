@@ -12,7 +12,7 @@ class Trade_Strategy:
         params = {'dif': 1.5,
                   'period': '5min',
                   'risk_rate': 0.5,
-                  'amount': 2,
+                  'amount': 5,
                   'symbol': 'eth_usdt',
                   'size': 120,
                   'point':1
