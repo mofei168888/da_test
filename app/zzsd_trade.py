@@ -12,7 +12,7 @@ class Trade_Strategy:
         params = {'dif': 1.5,
                   'period': '5min',
                   'risk_rate': 0.5,
-                  'amount': 10,
+                  'amount': 15,
                   'symbol': 'eth_usdt',
                   'size': 120,
                   'point':0.5
@@ -36,7 +36,7 @@ class Trade_Strategy:
             #print('(买入做多)当前价格;%s,五个交易单元高价:%s'%(self._trader._buffer[-1],np.amax(self._trader._buffer[-6:-2])))
             signal=2
         #当价格向下跌到前五个交易单元收盘高价时，平掉做多仓位止损
-        if self._trader.new_price < np.amax(self._trader._buffer[-6:-2])-self._trader._params['point']*8:
+        if self._trader.new_price < np.amax(self._trader._buffer[-7:-3])-self._trader._params['point']*5:
             #print('(做多平仓)当前价格;%s,五个交易单元高价:%s' % (self._trader._buffer[-1], np.amax(self._trader._buffer[-6:-2])))
             signal =1
 
@@ -45,7 +45,7 @@ class Trade_Strategy:
             #print('(买入做空)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1],  np.amin(self._trader._buffer[-6:-2])))
             signal = -2
         # 当价格向上涨到前五个交易单元收盘低价时，平掉做空仓位止损
-        if self._trader.new_price > np.amin(self._trader._buffer[-6:-2])+self._trader._params['point']*8:
+        if self._trader.new_price > np.amin(self._trader._buffer[-7:-3])+self._trader._params['point']*5:
             #print('(做空平仓)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1], np.amin(self._trader._buffer[-6:-2])))
             signal = -1
 
