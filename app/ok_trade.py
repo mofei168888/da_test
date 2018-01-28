@@ -25,7 +25,6 @@ class OK_Trade:
     def get_calculates_values(self):
         init_data = self._OKServices.get_future_kline(self._params['symbol'], self._params['period'], 1)
         if init_data and init_data[0][0]  > self._lasttime:
-            print('进入')
             self._buffer.append(init_data[0][4])
             self._lasttime = init_data[0][0]
         if len(self._buffer)>self._params['size']:
