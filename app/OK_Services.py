@@ -100,7 +100,7 @@ class Ok_Services:
                   }
         return self.utils.api_key_get(params,path)
 
-    def get_future_depth(self,symbol,contract_type='this_week'):
+    def get_future_depth(self,symbol,size=5,contract_type='this_week'):
         '''
         #获取OKex 合约深度信息
         :param symbol:
@@ -109,7 +109,8 @@ class Ok_Services:
         '''
         path = OK_API['F_DEPTH'][0]
         params = {'symbol': symbol,
-                  'contract_type': contract_type
+                  'contract_type': contract_type,
+                  'size':size
                   }
         return self.utils.api_key_get(params, path)
 

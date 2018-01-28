@@ -8,12 +8,29 @@ except Exception as e:
     from OK_Services import *
 
 
-class OK_MAKER:
+class OK_Trade:
 
     def __init__(self,params):
         self._params = params
         self._OKServices = Ok_Services()
-        self._price={'buy':0.0000,'sell':0.0000}
+        self._price={'buy':0.0000,'sell':0.0000,'high':0.0000,'low':0.0000,'mid':0.0000,'avg':0.0000}
+        self._buffer=[]
+        init_data = self._OKServices.get_future_kline(self._params['symbol'],self._params['period'],self._params['size'])
+        if init_data:
+            for price in init_data:
+                self._buffer.append(price[4])
+
+    def get_calculates_values(self):
+        init_data = self._OKServices.get_future_kline(self._params['symbol'], self._params['period'], 1)
+        if init_data:
+            self._buffer.append(init_data[0][4])
+        if len(self._buffer)>self._params['size']:
+            del self._buffer[0]
+
+        self._price['high'] = np.amax(self._buffer)
+        self._price['low'] = np.amin(self._buffer)
+        self._price['mid'] = np.median(self._buffer)
+        self._price['avg'] = np.mean(self._buffer)
 
     def get_price_depth(self,symbol):
         '''
@@ -138,14 +155,18 @@ class OK_MAKER:
     def get_trade_signal(self,symbol,period='1min',size = 60,contract_type='this_week'):
 
         result = ok_maker.get_ma_data(symbol, period,size) #获取均线数据
+        #print(result)
         if result['status']:
 
-            if result['data']['price']>result['data']['ma5']:
-                result['signal'] = 1
+            self.get_calculates_values()
 
-            if result['data']['price']<result['data']['ma5']:
-                result['signal'] = -1
+            print('近两小时最高价：%s，最低价：%s,中位值:%s,平均值;%s,差异:%s'%(self._price['high'],
+                                                    self._price['low'],
+                                                    self._price['mid'],self._price['avg'],
+                                                    self._price['high']-self._price['low']))
 
+
+            print('price:%s,buffer:%s'%(result['data']['price'],self._buffer[-1]))
 
             '''
             if  result['data']['price']>result['data']['ma5'] and result['data']['ma5'] < result['data']['ma10']<result['data']['ma15']:#价格上出现变盘信号
@@ -449,16 +470,21 @@ class OK_MAKER:
 
         return orders
 
-if __name__ == '__main__':
-    params ={'dif':1.5}
-    params ={'m5m10':0.2}
-    params ={'risk_rate':0.5}
-    params ={'amount':5}
 
-    ok_maker = OK_MAKER(params)
-    symbol = 'eth_usdt'
+if __name__ == '__main__':
+    params ={'dif':1.5,
+             'period': '5min',
+             'risk_rate': 0.5,
+             'amount': 5,
+             'symbol': 'eth_usdt',
+             'size': 120
+             }
+
+    ok_maker = OK_Trade(params)
     while True:
-        result=ok_maker.night_trade(symbol)
+        #result=ok_maker.night_trade(symbol)
+        result = ok_maker.get_trade_signal(params['symbol'])
+        #print(result)
 
 
 
