@@ -17,16 +17,16 @@ class OK_Trade:
         self._price={'buy':0.0000,'sell':0.0000,'high':0.0000,'low':0.0000,'mid':0.0000,'avg':0.0000}
         self._buffer=[]
         init_data = self._OKServices.get_future_kline(self._params['symbol'],self._params['period'],self._params['size'])
-        self._lasttime = init_data[-1][0]
+        self.new_price = init_data[-1][4]
         if init_data:
             for price in init_data:
                 self._buffer.append(price[4])
 
     def get_calculates_values(self):
         init_data = self._OKServices.get_future_kline(self._params['symbol'], self._params['period'], 1)
-        if init_data and init_data[0][0]  > self._lasttime:
+        self.new_price = init_data[0][4]
+        if init_data :
             self._buffer.append(init_data[0][4])
-            self._lasttime = init_data[0][0]
         if len(self._buffer)>self._params['size']:
             del self._buffer[0]
 
