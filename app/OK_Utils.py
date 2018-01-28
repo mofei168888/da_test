@@ -9,7 +9,6 @@ import urllib.request
 
 import requests
 
-import numpy as np
 
 try:
     from app.settings import *
