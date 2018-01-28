@@ -106,6 +106,8 @@ class Trade_Strategy:
 if __name__ == '__main__':
     ts = Trade_Strategy()
     while True:
-        ts.trade_system('eth_usdt')
-        ts.stop_less_profit('eth_usdt')
-
+        try:
+            ts.trade_system('eth_usdt')
+            ts.stop_less_profit('eth_usdt')
+        except Exception as e:
+            print('发生异常:%s'%e)
