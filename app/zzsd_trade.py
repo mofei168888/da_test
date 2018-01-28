@@ -31,20 +31,20 @@ class Trade_Strategy:
         signal = 0
         self._trader.get_calculates_values()  # 获取最新的价格，并进行相应的计算
         # 当价格向上突破前五个交易单元的收盘价时，执行挂单做多
-        if self._trader.new_price > np.amax(self._trader._buffer[-5:-1])+self._trader._params['point']:
+        if self._trader.new_price > np.amax(self._trader._buffer[-6:-2])+self._trader._params['point']:
             #print('(买入做多)当前价格;%s,五个交易单元高价:%s'%(self._trader._buffer[-1],np.amax(self._trader._buffer[-6:-2])))
             signal=2
         #当价格向下跌到前五个交易单元收盘高价时，平掉做多仓位止损
-        if self._trader.new_price < np.amax(self._trader._buffer[-5:-1])-self._trader._params['point']:
+        if self._trader.new_price < np.amax(self._trader._buffer[-6:-2])-self._trader._params['point']:
             #print('(做多平仓)当前价格;%s,五个交易单元高价:%s' % (self._trader._buffer[-1], np.amax(self._trader._buffer[-6:-2])))
             signal =1
 
         # 当价格向下突破前五个交易单的收盘价时，执行挂单做空
-        if self._trader.new_price < np.amin(self._trader._buffer[-5:-1])-self._trader._params['point']:
+        if self._trader.new_price < np.amin(self._trader._buffer[-6:-2])-self._trader._params['point']:
             #print('(买入做空)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1],  np.amin(self._trader._buffer[-6:-2])))
             signal = -2
         # 当价格向上涨到前五个交易单元收盘低价时，平掉做空仓位止损
-        if self._trader.new_price > np.amin(self._trader._buffer[-5:-1])+self._trader._params['point']:
+        if self._trader.new_price > np.amin(self._trader._buffer[-6:-2])+self._trader._params['point']:
             #print('(做空平仓)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1], np.amin(self._trader._buffer[-6:-2])))
             signal = -1
 
