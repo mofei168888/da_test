@@ -18,7 +18,7 @@ class Trade_Strategy:
                   'size': 120,
                   'point':0.1,
                   'profit':8,
-                  'lose':2
+                  'lose':-4
                   }
         self._trader = OK_Trade(params)
 
@@ -36,12 +36,12 @@ class Trade_Strategy:
         #print(self._trader.new_price)
         # 当价格向上突破前五个交易单元的收盘价时，执行挂单做多
         if self._trader.new_price > np.amax(self._trader._buffer[-6:-2])+self._trader._params['point']:
-            print('(买入做多)当前价格;%s,五个交易单元高价:%s'%(self._trader._buffer[-1],np.amax(self._trader._buffer[-6:-2])))
+            #print('(买入做多)当前价格;%s,五个交易单元高价:%s'%(self._trader._buffer[-1],np.amax(self._trader._buffer[-6:-2])))
             signal=2
 
         # 当价格向下突破前五个交易单的收盘价时，执行挂单做空
         if self._trader.new_price < np.amin(self._trader._buffer[-6:-2])-self._trader._params['point']:
-            print('(买入做空)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1],  np.amin(self._trader._buffer[-6:-2])))
+            #print('(买入做空)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1],  np.amin(self._trader._buffer[-6:-2])))
             signal = -2
 
         return signal
@@ -51,7 +51,7 @@ class Trade_Strategy:
         user_pos = self._trader.get_user_position(symbol)
         if user_pos['status']:
             signal = self.get_trade_signal(symbol,period,size,contract_type)
-            print('交易信号：%s'%signal)
+            #print('交易信号：%s'%signal)
             if signal ==2:#做多交易信号
                 if user_pos['buy_amount'] == 0:  # 没有做多持仓
                     buy_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
@@ -86,12 +86,13 @@ class Trade_Strategy:
             #执行利润收割，减少回撤,止赢,保持利润,每10个点收割一次
             if user_pos['buy_amount'] > 0:#表示持有做多头寸
                 if new_buy - user_pos['buy_cost'] < self._trader._params['lose']:#执行做多订单止损
+                    #print('盘口价格:%s,成本价:%s,价格差异：%s,止损点位:%s'%(new_buy,user_pos['buy_cost'],new_buy - user_pos['buy_cost'],self._trader._params['lose']))
                     pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
                                                                           match_price=1, price=0.005,
                                                                           amount=user_pos['buy_available'])
                     if pd_order:
                         orders = pd_order
-                        print('做多平仓订单已下单(市价)：%s' % pd_order)
+                        print('做多止损订单已下单(市价)：%s' % pd_order)
                 if new_buy - user_pos['buy_cost'] >self._trader._params['profit']:#执行做多订单止赢
                     pd_amount = int(user_pos['buy_available'] * 0.2)
                     if pd_amount < 1:
@@ -112,7 +113,7 @@ class Trade_Strategy:
                                                                           amount=user_pos['sell_available'])
                     if pk_order:
                         orders = pk_order
-                        print('做空平仓订单已下单(市价)：%s' % pk_order)
+                        print('做空止损订单已下单(市价)：%s' % pk_order)
                 if user_pos['sell_cost'] - new_sell>self._trader._params['profit']:#做空头寸止赢
                     pk_amount = int(user_pos['sell_available'] * 0.2)
                     if pk_amount < 1:
