@@ -8,7 +8,7 @@ import urllib.parse
 import urllib.request
 
 import requests
-
+import logger
 
 try:
     from app.settings import *
