@@ -21,8 +21,8 @@ class Trade_Strategy:
                 params = json.load(fr)
         self._trader = OK_Trade(params)
         self._last_cost={}
-        self._last_cost['buy_cost'] =self._trader.new_price #移动止损价格
-        self._last_cost['sell_cost'] = self._trader.new_price  # 移动止损价格
+        self._last_cost['buy_cost'] =np.amax(self._trader._buffer[-6:-1]) #移动止损价格
+        self._last_cost['sell_cost'] = np.amin(self._trader._buffer[-6:-1])  # 移动止损价格
 
     def get_trade_signal(self,symbol,period='1min',size = 60,contract_type='this_week'):
         '''
