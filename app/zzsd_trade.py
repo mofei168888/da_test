@@ -18,7 +18,7 @@ class Trade_Strategy:
                   'size': 120,
                   'point':0.1,
                   'profit':8,
-                  'lose':-3
+                  'lose':-4
                   }
         self._trader = OK_Trade(params)
 
