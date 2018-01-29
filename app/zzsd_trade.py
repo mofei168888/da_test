@@ -135,9 +135,9 @@ class Trade_Strategy:
                 price_list.append(self._trader.new_price)
                 price_list.append(self._last_cost['buy_cost'])
                 self._last_cost['buy_cost'] = np.amax(price_list) #更新最新价格
-                print('最新价格:%s,移动成本:%s,止损点数;%s' % (self._trader.new_price, self._cost_price, self._trader._params['lose']))
+                #print('最新价格:%s,移动成本:%s,止损点数;%s' % (self._trader.new_price, self._last_cost['buy_cost'], self._trader._params['lose']))
                 if self._trader.new_price - self._last_cost['buy_cost'] < self._trader._params['lose']:  # 执行做多订单止损
-                    print('执行做多止损')
+                    #print('执行做多止损')
                     self._trader._buffer.append(self._last_cost['buy_cost'])
                     pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
                                                                           match_price=1, price=0.005,
@@ -151,9 +151,9 @@ class Trade_Strategy:
                 price_list.append(self._trader.new_price)
                 price_list.append(self._last_cost['sell_cost'])
                 self._last_cost['sell_cost'] = np.amin(price_list)  # 更新最新价格
-                print('最新价格:%s,移动成本:%s,止损点数;%s' % (self._trader.new_price, self._cost_price, self._trader._params['lose']))
+                #print('最新价格:%s,移动成本:%s,止损点数;%s' % (self._trader.new_price, self._last_cost['sell_cost'], self._trader._params['lose']))
                 if  self._last_cost['sell_cost'] -self._trader.new_price < self._trader._params['lose']:  # 执行做多订单止损
-                    print('执行做空止损')
+                    #print('执行做空止损')
                     self._trader._buffer.append(self._last_cost['sell_cost'])
                     pk_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
                                                                           match_price=1, price=0.005,
