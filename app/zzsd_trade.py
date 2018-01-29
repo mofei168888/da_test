@@ -167,7 +167,6 @@ class Trade_Strategy:
 if __name__ == '__main__':
     ts = Trade_Strategy()
 
-
     while True:
         try:
             ts.trade_system('eth_usdt')
