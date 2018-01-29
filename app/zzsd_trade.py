@@ -78,10 +78,7 @@ class Trade_Strategy:
             price = self._trader.get_price_depth(symbol)
             new_buy = self._trader.new_price
             new_sell = self._trader.new_price
-            if price[0]!=0:#表示取到数据
-                new_buy = price[0]
-            if price[1]!=0:#表示取到数据
-                new_sell = price[1]
+
             #执行利润收割，减少回撤,止赢,保持利润,每10个点收割一次
             if user_pos['buy_amount'] > 0:#表示持有做多头寸
                 if new_buy - user_pos['buy_cost'] < self._trader._params['lose']:#执行做多订单止损
