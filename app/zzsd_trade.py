@@ -35,21 +35,13 @@ class Trade_Strategy:
         #print(self._trader.new_price)
         # 当价格向上突破前五个交易单元的收盘价时，执行挂单做多
         if self._trader.new_price > np.amax(self._trader._buffer[-6:-2])+self._trader._params['point']:
-            #print('(买入做多)当前价格;%s,五个交易单元高价:%s'%(self._trader._buffer[-1],np.amax(self._trader._buffer[-6:-2])))
+            print('(买入做多)当前价格;%s,五个交易单元高价:%s'%(self._trader._buffer[-1],np.amax(self._trader._buffer[-6:-2])))
             signal=2
-        #当价格向下跌到前五个交易单元收盘高价时，平掉做多仓位止损
-        if self._trader.new_price < np.amax(self._trader._buffer[-7:-3])-self._trader._params['point']*5:
-            #print('(做多平仓)当前价格;%s,五个交易单元高价:%s' % (self._trader._buffer[-1], np.amax(self._trader._buffer[-6:-2])))
-            signal =1
 
         # 当价格向下突破前五个交易单的收盘价时，执行挂单做空
         if self._trader.new_price < np.amin(self._trader._buffer[-6:-2])-self._trader._params['point']:
-            #print('(买入做空)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1],  np.amin(self._trader._buffer[-6:-2])))
+            print('(买入做空)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1],  np.amin(self._trader._buffer[-6:-2])))
             signal = -2
-        # 当价格向上涨到前五个交易单元收盘低价时，平掉做空仓位止损
-        if self._trader.new_price > np.amin(self._trader._buffer[-7:-3])+self._trader._params['point']*5:
-            #print('(做空平仓)当前价格;%s,五个交易单元低价:%s' % (self._trader._buffer[-1], np.amin(self._trader._buffer[-6:-2])))
-            signal = -1
 
         return signal
 
@@ -58,6 +50,7 @@ class Trade_Strategy:
         user_pos = self._trader.get_user_position(symbol)
         if user_pos['status']:
             signal = self.get_trade_signal(symbol,period,size,contract_type)
+            print('交易信号：%s'%signal)
             if signal ==2:#做多交易信号
                 if user_pos['buy_amount'] == 0:  # 没有做多持仓
                     buy_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
@@ -112,6 +105,7 @@ class Trade_Strategy:
                 if pk_order:
                     orders = pk_order
                     print('做空平仓订单已下单(市价)：%s' % pk_order)
+
 
 
             #---------------------------------------------------------------------------------------------------------#
