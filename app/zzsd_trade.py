@@ -91,17 +91,24 @@ class Trade_Strategy:
                 new_sell = price[1]
             #执行利润收割，减少回撤,止赢,保持利润,每10个点收割一次
             if user_pos['buy_amount'] > 0 and (new_buy - user_pos['buy_cost']) >self._trader._params['profit']:
+                pd_amount = int(user_pos['buy_available']*0.2)
+                if pd_amount <1:
+                    pd_amount = user_pos['sell_available']
+
                 pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
                                                                       match_price=1, price=0.005,
-                                                                      amount=int(user_pos['buy_available']*0.2))
+                                                                      amount=pd_amount)
                 if pd_order:
                     orders = pd_order
                     print('做多平仓订单已下单(市价)：%s' % pd_order)
 
             if user_pos['sell_amount'] > 0 and (user_pos['sell_cost'] - new_sell)>self._trader._params['profit']:
+                pk_amount = int(user_pos['sell_available']*0.2)
+                if pk_amount<1:
+                    pk_amount = user_pos['sell_available']
                 pk_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
                                                                       match_price=1, price=0.005,
-                                                                      amount=int(user_pos['sell_available']*0.2))
+                                                                      amount=pk_amount)
                 if pk_order:
                     orders = pk_order
                     print('做空平仓订单已下单(市价)：%s' % pk_order)
