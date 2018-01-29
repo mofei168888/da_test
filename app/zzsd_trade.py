@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 try:
     from app.ok_trade import *
 except Exception as e:
@@ -12,10 +13,11 @@ class Trade_Strategy:
         params = {'dif': 1.5,
                   'period': '5min',
                   'risk_rate': 0.5,
-                  'amount': 10,
+                  'amount': 15,
                   'symbol': 'eth_usdt',
                   'size': 120,
-                  'point':0.5
+                  'point':0.5,
+                  'profit':8
                   }
         self._trader = OK_Trade(params)
 
@@ -80,9 +82,32 @@ class Trade_Strategy:
         user_pos = self._trader.get_user_position(symbol)
         if user_pos['status']:
             signal = self.get_trade_signal(symbol, period, size, contract_type)
-            #price = self._trader.get_price_depth(symbol)
-            #print('盘口:%s,%s'%(price[0],price[0]))
-            #print('交易信号:%s'%signal)
+            price = self._trader.get_price_depth(symbol)
+            new_buy = self._trader.new_price
+            new_sell = self._trader.new_price
+            if price[0]!=0:#表示取到数据
+                new_buy = price[0]
+            if price[1]!=0:#表示取到数据
+                new_sell = price[1]
+            #执行利润收割，减少回撤,止赢,保持利润,每10个点收割一次
+            if user_pos['buy_amount'] > 0 and (new_buy - user_pos['buy_cost']) >self._trader._params['profit']:
+                pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
+                                                                      match_price=1, price=0.005,
+                                                                      amount=int(user_pos['buy_available']*0.2))
+                if pd_order:
+                    orders = pd_order
+                    print('做多平仓订单已下单(市价)：%s' % pd_order)
+
+            if user_pos['sell_amount'] > 0 and (user_pos['sell_cost'] - new_sell)>self._trader._params['profit']:
+                pk_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
+                                                                      match_price=1, price=0.005,
+                                                                      amount=int(user_pos['sell_available']*0.2))
+                if pk_order:
+                    orders = pk_order
+                    print('做空平仓订单已下单(市价)：%s' % pk_order)
+
+
+            #---------------------------------------------------------------------------------------------------------#
             if signal==1:#将做多持仓平仓
                 if user_pos['buy_amount'] > 0:
                     pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
@@ -91,8 +116,6 @@ class Trade_Strategy:
                     if pd_order:
                         orders = pd_order
                         print('做多平仓订单已下单(市价)：%s' % pd_order)
-            if signal==2:#行情依然在上涨
-                pass
             if signal==-1:#将做空持仓平仓
                 if user_pos['sell_amount'] > 0:
                     pk_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
@@ -102,8 +125,6 @@ class Trade_Strategy:
                         orders = pk_order
                         print('做空平仓订单已下单(市价)：%s' % pk_order)
 
-            if signal==-2:#行情依然在下跌
-                pass
         return orders
 
 
