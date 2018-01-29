@@ -16,9 +16,9 @@ class OK_Trade:
         self._buffer=[]
 
         init_data = self._OKServices.get_future_kline(self._params['symbol'],self._params['period'],self._params['size'])
-        self.new_price = init_data[-1][4]
-        self._last_time = init_data[-1][0] #将最近K线时间保存起来
         if init_data:
+            self.new_price = init_data[-1][4]
+            self._last_time = init_data[-1][0]  # 将最近K线时间保存起来
             for price in init_data:
                 self._buffer.append(price[4])
 
