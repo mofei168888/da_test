@@ -21,6 +21,8 @@ class Trade_Strategy:
                 params = json.load(fr)
         self._trader = OK_Trade(params)
 
+        self._cost_price =self._trader.new_price #移动止损价格
+
     def get_trade_signal(self,symbol,period='1min',size = 60,contract_type='this_week'):
         '''
         追涨杀跌策略
@@ -122,6 +124,40 @@ class Trade_Strategy:
 
         return orders
 
+    def move_lose_profit(self,symbol,period='1min',size = 60,contract_type='this_week'):
+        orders={}
+        user_pos = self._trader.get_user_position(symbol)
+        if user_pos['status']:
+            self._trader.get_calculates_values()#更新价格
+            if user_pos['buy_amount'] > 0:  # 表示持有做多头寸
+                price_list=[]
+                price_list.append(self._trader.new_price)
+                price_list.append(self._cost_price)
+                self._cost_price = np.amax(price_list) #更新最新价格
+                #print('最新价格:%s,移动成本:%s,止损点数;%s' % (self._trader.new_price, self._cost_price, self._trader._params['lose']))
+                if self._trader.new_price - self._cost_price < self._trader._params['lose']:  # 执行做多订单止损
+                    pd_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PD'],
+                                                                          match_price=1, price=0.005,
+                                                                          amount=user_pos['buy_available'])
+                    if pd_order:
+                        orders = pd_order
+                        print('做多止损订单已下单(市价)：%s' % pd_order)
+
+            if user_pos['sell_amount'] > 0:#表示持有做空头寸
+                price_list = []
+                price_list.append(self._trader.new_price)
+                price_list.append(self._cost_price)
+                self._cost_price = np.amin(price_list)  # 更新最新价格
+                #print('最新价格:%s,移动成本:%s,止损点数;%s' % (self._trader.new_price, self._cost_price, self._trader._params['lose']))
+                if  self._cost_price -self._trader.new_price < self._trader._params['lose']:  # 执行做多订单止损
+                    pk_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['PK'],
+                                                                          match_price=1, price=0.005,
+                                                                          amount=user_pos['sell_available'])
+                    if pk_order:
+                        orders = pk_order
+                        print('做空止损订单已下单(市价)：%s' % pk_order)
+
+        return orders
 
 if __name__ == '__main__':
     ts = Trade_Strategy()
@@ -130,7 +166,7 @@ if __name__ == '__main__':
     while True:
         try:
             ts.trade_system('eth_usdt')
-            ts.stop_less_profit('eth_usdt')
+            ts.move_lose_profit('eth_usdt')
         except Exception as e:
             print('发生异常:%s'%e)
 
