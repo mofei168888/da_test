@@ -18,7 +18,7 @@ class Trade_Strategy:
                   'size': 120,
                   'point':0.1,
                   'profit':8,
-                  'lose':-4
+                  'lose':-3
                   }
         self._trader = OK_Trade(params)
 
@@ -75,7 +75,6 @@ class Trade_Strategy:
         orders={}
         user_pos = self._trader.get_user_position(symbol)
         if user_pos['status']:
-            signal = self.get_trade_signal(symbol, period, size, contract_type)
             price = self._trader.get_price_depth(symbol)
             new_buy = self._trader.new_price
             new_sell = self._trader.new_price
