@@ -16,7 +16,7 @@ class Trade_Strategy:
                   'amount': 12,
                   'symbol': 'eth_usdt',
                   'size': 120,
-                  'point':0.5,
+                  'point':0.1,
                   'profit':8,
                   'lose':2
                   }
