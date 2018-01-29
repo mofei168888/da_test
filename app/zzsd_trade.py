@@ -20,6 +20,24 @@ class Trade_Strategy:
                   'profit':8,
                   'lose':-3.5
                   }
+        #print(params)
+        param={}
+        # Windows will be : Windows
+        # Linux will be : Linux
+        if platform.system() == 'Windows':
+            with open("D:\config\params.json",'w') as fw:
+                json.dump(params,fw)
+
+            with open("D:\config\params.json",'r') as fr:
+                data = json.load(fr)
+                print(data)
+        if platform.system() == 'Linux':
+            with open("/home/params.json",'w') as fw:
+                json.dump(params,fw)
+            with open("/home/params.json",'r') as fr:
+                data = json.load(fr)
+                print(data)
+
         self._trader = OK_Trade(params)
 
     def get_trade_signal(self,symbol,period='1min',size = 60,contract_type='this_week'):
@@ -126,9 +144,12 @@ class Trade_Strategy:
 
 if __name__ == '__main__':
     ts = Trade_Strategy()
+
+    '''
     while True:
         try:
             ts.trade_system('eth_usdt')
             ts.stop_less_profit('eth_usdt')
         except Exception as e:
             print('发生异常:%s'%e)
+    '''

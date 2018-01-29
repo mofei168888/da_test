@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import platform
-
 try:
     from app.OK_Utils import *
 except Exception as e:

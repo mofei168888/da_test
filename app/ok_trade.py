@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-
 try:
     from app.OK_Services import *
 except Exception as e:

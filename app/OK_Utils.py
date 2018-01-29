@@ -10,6 +10,9 @@ import urllib.request
 import requests
 import logger
 import math
+import platform
+import numpy as np
+import json
 
 try:
     from app.settings import *
