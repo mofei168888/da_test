@@ -301,7 +301,7 @@ if __name__ == '__main__':
     zlog = logging.getLogger('ok.strategy.zzsd')
     tlog = logging.getLogger('ok.trade')
     tlog.setLevel(logging.ERROR)
-    zlog.setLevel(logging.INFO)
+    zlog.setLevel(logging.INFO)#将主机的日志改一下
     while True:
         try:
             ts.trade_kc('eth_usdt')
