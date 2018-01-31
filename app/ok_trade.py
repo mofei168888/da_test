@@ -73,6 +73,8 @@ class OK_Trade:
                     self._user_cost['buy_cost'] = np.amax(buy_price)  # 更新成本价格
                     self._stop_price['buy_price'] = np.amax(buy_price) - self._params['lose']  # 更新最新价格
                     self._log.log_debug('最新做多止损价格;%s' % self._stop_price['buy_price'])
+            else:#用户没有做多持仓
+                self._user_cost['buy_cost'] = 0.0000
 
             if self._user_pos['sell_amount'] > 0:#拥有做空持仓，然后再更新成本信息
                 sell_price = []
@@ -83,7 +85,8 @@ class OK_Trade:
                     self._user_cost['sell_cost'] = np.amin(sell_price)  # 更新成本价格
                     self._stop_price['sell_price'] = np.amin(sell_price) + self._params['lose']  # 更新最新价格
                     self._log.log_debug('最新做空止损价格:%s' % self._stop_price['sell_price'])
-
+            else:#用户没有做空持仓
+                self._user_cost['sell_cost'] = 0.0000
 
 
     def get_price_depth(self,symbol):
