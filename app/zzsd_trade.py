@@ -263,9 +263,11 @@ class Trade_Strategy:
         signal = 0
         self._trader.get_calculates_values()
 
-        self._log.log_debug('当前最新价格;%s,做多止损价格:%s,做空止损价格:%s' % (self._trader._new_price,
+        '''
+        self._log.log_debug('当前最新价格:%s,做多止损价格:%s,做空止损价格:%s' % (self._trader._new_price,
                                                                self._trader._stop_price['buy_price'],
                                                                self._trader._stop_price['sell_price']))
+        '''
         if self._trader._new_price < self._trader._stop_price['buy_price'] and self._trader._user_pos['buy_amount']!=0:
             self._trader._buffer.append(self._trader._user_cost['buy_cost'])
             self._log.log_debug('最新高价：%s,Buffer长度:%s'%(self._trader._buffer[-1],len(self._trader._buffer)))
