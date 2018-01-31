@@ -214,13 +214,10 @@ class Trade_Strategy:
         # 当价格向上突破前六个交易单元的收盘价时，执行挂单做多
 
         if np.amax(self._trader._buffer[-7:-1]) - np.amin(self._trader._buffer[-7:-1]) <self._trader._params['space']:#市场震荡空间很小，不下单
-            #--------------------处理针式下探，或者针式上探的问题--------------------------------------------#
-
-            #------------------------------------------------------------------------------------------------#
-
+            self._log.log_debug('震荡区间太小，不执行下单操作')
+        else:##市场震荡空间很大，才执行操作
             if self._trader._new_price > np.amax(self._trader._buffer[-7:-1])+self._trader._params['point']:
                 signal=1
-
             # 当价格向下突破前六个交易单元的收盘价时，执行挂单做空
             if self._trader._new_price < np.amin(self._trader._buffer[-7:-1])-self._trader._params['point']:
                 signal = -1
