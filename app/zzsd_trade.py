@@ -259,12 +259,12 @@ class Trade_Strategy:
                                                                self._trader._stop_price['sell_price']))
         if self._trader._new_price < self._trader._stop_price['buy_price'] and self._trader._user_cost['buy_cost']!=0:
             self._trader._buffer.append(self._trader._user_cost['buy_cost'])
-            self._log.log_debug('最新高价：%s'%self._trader._buffer[-1])
+            self._log.log_debug('最新高价：%s,Buffer长度:%s'%(self._trader._buffer[-1],len(self._trader._buffer)))
             signal = 1 #发出做多平仓信号
 
         if self._trader._new_price > self._trader._stop_price['sell_price'] and self._trader._user_cost['sell_cost']!=0:
             self._trader._buffer.append(self._trader._user_cost['sell_cost'])
-            self._log.log_debug('最新低价：%s' % self._trader._buffer[-1])
+            self._log.log_debug('最新低价：%s,Buffer长度:%s' % (self._trader._buffer[-1], len(self._trader._buffer)))
             signal = -1  # 发出做空平仓信号
 
         return signal
