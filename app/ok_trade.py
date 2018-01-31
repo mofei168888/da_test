@@ -14,28 +14,77 @@ class OK_Trade:
         self._OKServices = Ok_Services()
         self._price={'buy':0.0000,'sell':0.0000,'high':0.0000,'low':0.0000,'mid':0.0000,'avg':0.0000}
         self._buffer=[]
+        self._user_cost = {}
+        self._stop_price={'buy_price':0.0000,'sell_price':0.0000}
+        self._user_pos={}
+
+        self._log= Logger('ok.trade')
+        self._log.set_log_level(logging.DEBUG)
 
         init_data = self._OKServices.get_future_kline(self._params['symbol'],self._params['period'],self._params['size'])
         if init_data:
-            self.new_price = init_data[-1][4]
+            self._new_price = init_data[-1][4]
             self._last_time = init_data[-1][0]  # 将最近K线时间保存起来
             for price in init_data:
                 self._buffer.append(price[4])
 
+        # 获取用户持仓成本价格,采用用户持仓成本进行成本初始化
+        user_pos = self.get_user_position(self._params['symbol'])
+        if user_pos['status']:
+            self._user_pos = user_pos
+            if self._user_pos['buy_amount']>0:
+                self._user_cost['buy_cost'] = self._user_pos['buy_cost']
+            else:
+                self._user_cost['buy_cost'] = 0.0000
+            if self._user_pos['sell_amount']>0:
+                self._user_cost['sell_cost'] = self._user_pos['sell_cost']
+            else:
+                self._user_cost['sell_cost'] = 0.0000
+            self._log.log_debug('用户持仓成本:%s' % self._user_cost)
+
     def get_calculates_values(self):
+        #更新价格和K线信息
         init_data = self._OKServices.get_future_kline(self._params['symbol'], self._params['period'], 1)
-        self.new_price = init_data[0][4]
-        if init_data and init_data[0][0]>self._last_time:#判断获取的时间和已经保存的时间是否一致
-            self._buffer.append(init_data[0][4])
-            self._last_time = init_data[0][0] #更新系统时间
+        if init_data:
+            self._new_price = init_data[0][4]
+            self._log.log_debug('最新价格:%s'%self._new_price)
+            if init_data[0][0]>self._last_time:#判断获取的时间和已经保存的时间是否一致
+                self._buffer.append(init_data[0][4])
+                self._last_time = init_data[0][0] #更新系统时间
 
         if len(self._buffer)>self._params['size']:
             del self._buffer[0]
 
+        #计算期间最高价格，最低价格，中间价格,平均价格
         self._price['high'] = np.amax(self._buffer)
         self._price['low'] = np.amin(self._buffer)
         self._price['mid'] = np.median(self._buffer)
         self._price['avg'] = np.mean(self._buffer)
+
+        user_pos = self.get_user_position(self._params['symbol'])
+        if user_pos['status']:
+            self._user_pos = user_pos
+            if self._user_pos['buy_amount'] > 0:#拥有做多持仓，然后再更新成本信息
+                buy_price = []
+                buy_price.append(self._new_price)
+                buy_price.append(self._user_cost['buy_cost'])
+                self._log.log_debug('buy_price:%s' % buy_price)
+                if len(buy_price) == 2:
+                    self._user_cost['buy_cost'] = np.amax(buy_price)  # 更新成本价格
+                    self._stop_price['buy_price'] = np.amax(buy_price) - self._params['lose']  # 更新最新价格
+                    self._log.log_debug('最新做多止损价格;%s' % self._stop_price['buy_price'])
+
+            if self._user_pos['sell_amount'] > 0:#拥有做空持仓，然后再更新成本信息
+                sell_price = []
+                sell_price.append(self._new_price)
+                sell_price.append(self._user_cost['sell_cost'])
+                self._log.log_debug('sell_price:%s' % sell_price)
+                if len(sell_price) == 2:
+                    self._user_cost['sell_cost'] = np.amin(sell_price)  # 更新成本价格
+                    self._stop_price['sell_price'] = np.amin(sell_price) + self._params['lose']  # 更新最新价格
+                    self._log.log_debug('最新做空止损价格:%s' % self._stop_price['sell_price'])
+
+
 
     def get_price_depth(self,symbol):
         '''
@@ -233,7 +282,6 @@ class OK_Trade:
         return_data={}
         wt_type = []
         wt_orders = self._OKServices.get_future_order(symbol=symbol, order_id=-1)
-        print(wt_orders)
         if wt_orders:
             for order in wt_orders['orders']:
                 wt_type.append(order['type'])

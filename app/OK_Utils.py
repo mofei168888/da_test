@@ -8,7 +8,6 @@ import urllib.parse
 import urllib.request
 
 import requests
-import logger
 import math
 import platform
 import numpy as np
@@ -16,8 +15,10 @@ import json
 
 try:
     from app.settings import *
+    from app.Logger import *
 except Exception as e:
     from settings import *
+    from Logger import *
 
 
 class OK_Utils:
