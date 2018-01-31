@@ -39,7 +39,7 @@ class OK_Trade:
             if self._user_pos['sell_amount']>0:
                 self._user_cost['sell_cost'] = self._user_pos['sell_cost']
             else:
-                self._user_cost['sell_cost'] = 0.0000
+                self._user_cost['sell_cost'] = 100000.0000 #给一个很大的值
             self._log.log_debug('用户持仓成本:%s' % self._user_cost)
 
     def get_calculates_values(self):
