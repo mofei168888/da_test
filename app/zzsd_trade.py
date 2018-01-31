@@ -205,21 +205,31 @@ class Trade_Strategy:
          '''
         signal = 0
         self._trader.get_calculates_values()  # 获取最新的价格，并进行相应的计算
-        self._log.log_debug('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
-                                                                   np.amax(self._trader._buffer[-7:-1]),
-                                                                   np.amin(self._trader._buffer[-7:-1]),
-                                                                   np.amax(self._trader._buffer[-7:-1]) - np.amin(self._trader._buffer[-7:-1]),
-                                                                           self._trader._params['space']
-                                                                   ))
         # 当价格向上突破前六个交易单元的收盘价时，执行挂单做多
 
         if np.amax(self._trader._buffer[-7:-1]) - np.amin(self._trader._buffer[-7:-1]) <self._trader._params['space']:#市场震荡空间很小，不下单
             self._log.log_debug('震荡区间太小，不执行下单操作')
         else:##市场震荡空间满足条件，才执行操作
             if self._trader._new_price > np.amax(self._trader._buffer[-7:-1])+self._trader._params['point']:
+                self._log.log_debug('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
+                                                                                   np.amax(self._trader._buffer[-7:-1]),
+                                                                                   np.amin(self._trader._buffer[-7:-1]),
+                                                                                   np.amax(self._trader._buffer[
+                                                                                           -7:-1]) - np.amin(
+                                                                                       self._trader._buffer[-7:-1]),
+                                                                                   self._trader._params['space']
+                                                                                   ))
                 signal=1
             # 当价格向下突破前六个交易单元的收盘价时，执行挂单做空
             if self._trader._new_price < np.amin(self._trader._buffer[-7:-1])-self._trader._params['point']:
+                self._log.log_debug('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
+                                                                                   np.amax(self._trader._buffer[-7:-1]),
+                                                                                   np.amin(self._trader._buffer[-7:-1]),
+                                                                                   np.amax(self._trader._buffer[
+                                                                                           -7:-1]) - np.amin(
+                                                                                       self._trader._buffer[-7:-1]),
+                                                                                   self._trader._params['space']
+                                                                                   ))
                 signal = -1
 
 
@@ -230,7 +240,6 @@ class Trade_Strategy:
         user_pos = self._trader.get_user_position(symbol)
         if user_pos['status']:
             signal = self.get_kc_signal()
-            self._log.log_debug('开仓交易信号：%s'%signal)
             if signal ==1:#做多交易信号
                 if user_pos['buy_amount'] == 0:  # 没有做多持仓
                     buy_order = self._trader._OKServices.send_future_order(symbol=symbol, type=OK_ORDER_TYPE['KD'],
@@ -273,11 +282,13 @@ class Trade_Strategy:
 
     def trade_pc(self,symbol,period='1min',size = 60,contract_type='this_wek'):
         signal = self.get_pc_signal()
-        self._log.log_debug('平仓交易信号:%s'%signal)
+
         if signal==1:
+            self._log.log_debug('平仓交易信号:%s' % signal)
             self.send_pc_order(symbol=symbol,order_type=OK_ORDER_TYPE['PD'],order_price=0,match_price=1,
                                cancel_ys=True)
         if signal ==-1:
+            self._log.log_debug('平仓交易信号:%s' % signal)
             self.send_pc_order(symbol=symbol, order_type=OK_ORDER_TYPE['PK'], order_price=0, match_price=1,
                                cancel_ys=True)
 
