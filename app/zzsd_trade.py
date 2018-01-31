@@ -211,7 +211,7 @@ class Trade_Strategy:
             self._log.log_debug('震荡区间太小，不执行下单操作')
         else:##市场震荡空间满足条件，才执行操作
             if self._trader._new_price > np.amax(self._trader._buffer[-7:-1])+self._trader._params['point']  and self._trader._user_pos['buy_amount'] ==0:
-                self._log.log_debug('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
+                self._log.log_info('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
                                                                                    np.amax(self._trader._buffer[-7:-1]),
                                                                                    np.amin(self._trader._buffer[-7:-1]),
                                                                                    np.amax(self._trader._buffer[
@@ -222,7 +222,7 @@ class Trade_Strategy:
                 signal=1
             # 当价格向下突破前六个交易单元的收盘价时，执行挂单做空
             if self._trader._new_price < np.amin(self._trader._buffer[-7:-1])-self._trader._params['point'] and self._trader._user_pos['sell_amount'] ==0:
-                self._log.log_debug('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
+                self._log.log_info('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
                                                                                    np.amax(self._trader._buffer[-7:-1]),
                                                                                    np.amin(self._trader._buffer[-7:-1]),
                                                                                    np.amax(self._trader._buffer[
@@ -270,14 +270,14 @@ class Trade_Strategy:
         '''
         if self._trader._new_price < self._trader._stop_price['buy_price'] and self._trader._user_pos['buy_amount']!=0:
             self._trader._buffer.append(self._trader._user_cost['buy_cost'])
-            self._log.log_debug('最新高价：%s,Buffer长度:%s'%(self._trader._buffer[-1],len(self._trader._buffer)))
-            self._log.log_debug('最近6个交易单元收盘价:%s' % (self._trader._buffer[-7:-1]))
+            self._log.log_info('最新高价：%s,Buffer长度:%s'%(self._trader._buffer[-1],len(self._trader._buffer)))
+            self._log.log_info('最近6个交易单元收盘价:%s' % (self._trader._buffer[-7:-1]))
             signal = 1 #发出做多平仓信号
 
         if self._trader._new_price > self._trader._stop_price['sell_price'] and self._trader._user_pos['sell_amount']!=0:
             self._trader._buffer.append(self._trader._user_cost['sell_cost'])
-            self._log.log_debug('最新低价：%s,Buffer长度:%s' % (self._trader._buffer[-1], len(self._trader._buffer)))
-            self._log.log_debug('最近6个交易单元收盘价:%s' % (self._trader._buffer[-7:-1]))
+            self._log.log_info('最新低价：%s,Buffer长度:%s' % (self._trader._buffer[-1], len(self._trader._buffer)))
+            self._log.log_info('最近6个交易单元收盘价:%s' % (self._trader._buffer[-7:-1]))
             signal = -1  # 发出做空平仓信号
 
         return signal
@@ -286,11 +286,11 @@ class Trade_Strategy:
         signal = self.get_pc_signal()
 
         if signal==1:
-            self._log.log_debug('平仓交易信号:%s' % signal)
+            self._log.log_info('平仓交易信号:%s' % signal)
             self.send_pc_order(symbol=symbol,order_type=OK_ORDER_TYPE['PD'],order_price=0,match_price=1,
                                cancel_ys=True)
         if signal ==-1:
-            self._log.log_debug('平仓交易信号:%s' % signal)
+            self._log.log_info('平仓交易信号:%s' % signal)
             self.send_pc_order(symbol=symbol, order_type=OK_ORDER_TYPE['PK'], order_price=0, match_price=1,
                                cancel_ys=True)
 
@@ -301,7 +301,7 @@ if __name__ == '__main__':
     zlog = logging.getLogger('ok.strategy.zzsd')
     tlog = logging.getLogger('ok.trade')
     tlog.setLevel(logging.ERROR)
-    zlog.setLevel(logging.DEBUG)
+    zlog.setLevel(logging.INFO)
     while True:
         try:
             ts.trade_kc('eth_usdt')
