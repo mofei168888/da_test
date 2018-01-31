@@ -289,7 +289,7 @@ if __name__ == '__main__':
     zlog = logging.getLogger('ok.strategy.zzsd')
     tlog = logging.getLogger('ok.trade')
     tlog.setLevel(logging.ERROR)
-    zlog.setLevel(logging.ERROR)
+    zlog.setLevel(logging.DEBUG)
     while True:
         try:
             ts.trade_kc('eth_usdt')
