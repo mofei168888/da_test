@@ -175,7 +175,7 @@ class Trade_Strategy:
             if order_type in wt_orders['type_list'] and cancel_ys:  # 有委托订单，并且执行撤销
                 for order in wt_orders['orders']:
                     if order['type'] == order_type:  # 表示平多未成交，摊销未成交订单
-                        self._log.log_error(order)
+                        self._log.log_debug(order)
                         cancel_order = self._trader._OKServices.cancel_future_order(symbol, order['order_id'])
                         if cancel_order:  # 撤销订单成功 #执行移动止损，将止损挂单价格向上移动
                             self._log.log_info('订单撤销成功:%s'%cancel_order)
@@ -194,6 +194,9 @@ class Trade_Strategy:
                     self._log.log_info('平仓订单已下单%s：%s' %(match_price, pc_order))
 
         return orders
+
+    def send_kc_order(self,symbol,order_type,order_price,match_price=0,cancel_ys=False):
+        pass
     #-----------------------------------------------------------------------------------------------------#
     def get_kc_signal(self):
         '''
@@ -296,6 +299,18 @@ class Trade_Strategy:
             self._log.log_info('平仓交易信号:%s' % signal)
             self.send_pc_order(symbol=symbol, order_type=OK_ORDER_TYPE['PK'], order_price=0, match_price=1,
                                cancel_ys=True)
+
+    def keep_profit(self,symbol,period='1min',size = 60,contract_type='this_week'):
+        if self._trader._user_pos['buy_available']>0:
+            self.send_pc_order(symbol=symbol,order_type = OK_ORDER_TYPE['PD'],
+                               order_price=self._trader._user_pos['buy_cost']+self._trader._params['profit'],
+                               match_price=0,cancel_ys=False)
+
+        if self._trader._user_pos['sell_available']>0:
+            self.send_pc_order(symbol=symbol, order_type=OK_ORDER_TYPE['PK'],
+                               order_price=self._trader._user_pos['sell_cost']-self._trader._params['profit'],
+                               match_price=0,cancel_ys=False)
+
 
 if __name__ == '__main__':
     ts = Trade_Strategy()

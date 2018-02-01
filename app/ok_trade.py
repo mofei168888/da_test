@@ -41,6 +41,7 @@ class OK_Trade:
             else:
                 self._user_cost['sell_cost'] = 100000.0000 #给一个很大的值
             self._log.log_debug('用户持仓成本:%s' % self._user_cost)
+        self._log.log_debug('参数数据：%s'%self._params)
 
     def get_calculates_values(self):
         #更新价格和K线信息
