@@ -2,6 +2,7 @@
 
 
 
+import time
 try:
     from app.Logger import *
 except Exception as e:
@@ -10,10 +11,11 @@ except Exception as e:
 
 
 if __name__ == '__main__':
-     logger = Logger('eth_usdt')
-     log= logger.get_loger()
+     log= logging.getLogger('test')
 
      log.debug('debug info')
      log.info('info')
      log.warning('warning info')
+     time.sleep(5)
      log.error('error info')
+

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import time
 
 try:
     from app.ok_trade import *
@@ -212,10 +213,14 @@ class Trade_Strategy:
         # 当价格向上突破前六个交易单元的收盘价时，执行挂单做多
 
         if np.amax(self._trader._buffer[-6:-1]) - np.amin(self._trader._buffer[-6:-1]) <self._trader._params['space']:#市场震荡空间很小，不下单
-            self._log.log_debug('震荡区间太小，不执行下单操作')
+            if self._trader._new_price-np.amax(self._trader._buffer[-6:-1]) > self._trader._params['space']/2 and self._trader._user_pos['buy_amount'] ==0:
+                signal = 1
+            if np.amin(self._trader._buffer[-6:-1]) - self._trader._new_price > self._trader._params['space']/2 and self._trader._user_pos['sell_amount'] ==0:
+                signal = -1
+
         else:##市场震荡空间满足条件，才执行操作
             if self._trader._new_price > np.amax(self._trader._buffer[-6:-1])+self._trader._params['point']  and self._trader._user_pos['buy_amount'] ==0:
-                self._log.log_info('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
+                self._log.log_info('当前价格;%s,5个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
                                                                                    np.amax(self._trader._buffer[-6:-1]),
                                                                                    np.amin(self._trader._buffer[-6:-1]),
                                                                                    np.amax(self._trader._buffer[
@@ -226,7 +231,7 @@ class Trade_Strategy:
                 signal=1
             # 当价格向下突破前六个交易单元的收盘价时，执行挂单做空
             if self._trader._new_price < np.amin(self._trader._buffer[-6:-1])-self._trader._params['point'] and self._trader._user_pos['sell_amount'] ==0:
-                self._log.log_info('当前价格;%s,六个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
+                self._log.log_info('当前价格;%s,5个交易单元高价:%s,低价:%s,震荡区间:%s,条件区间:%s' % (self._trader._new_price,
                                                                                    np.amax(self._trader._buffer[-6:-1]),
                                                                                    np.amin(self._trader._buffer[-6:-1]),
                                                                                    np.amax(self._trader._buffer[
@@ -295,10 +300,12 @@ class Trade_Strategy:
             self._log.log_info('平仓交易信号:%s' % signal)
             self.send_pc_order(symbol=symbol,order_type=OK_ORDER_TYPE['PD'],order_price=0,match_price=1,
                                cancel_ys=True)
+            time.sleep(180)#平仓后，暂停3分钟
         if signal ==-1:
             self._log.log_info('平仓交易信号:%s' % signal)
             self.send_pc_order(symbol=symbol, order_type=OK_ORDER_TYPE['PK'], order_price=0, match_price=1,
                                cancel_ys=True)
+            time.sleep(180)#平仓后，暂停3分钟
 
     def keep_profit(self,symbol,period='1min',size = 60,contract_type='this_week'):
         if self._trader._user_pos['buy_available']>0:
