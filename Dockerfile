@@ -20,4 +20,4 @@ RUN cd /app && pip install -r requirements.txt
 EXPOSE 80
 
 
-ENTRYPOINT ["python", "/app/zzsd_trade.py"]
+ENTRYPOINT ["python", "/app/zzsd_strategy.py"]

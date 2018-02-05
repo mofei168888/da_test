@@ -5,9 +5,23 @@ import logging
 
 class Logger:
 
-    def __init__(self,name,level=logging.INFO):
-        logging.basicConfig(level=level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    def __init__(self,name,level=logging.DEBUG):
         self.logger = logging.getLogger(name)
+        self.formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+
+        ch = logging.StreamHandler()
+        ch.setLevel(level)
+        ch.setFormatter(self.formatter)
+
+        self.logger.addHandler(ch)
+
+    def set_log_file(self,level,file_name):
+        self.fh = logging.FileHandler(file_name)
+        self.fh.setLevel(level)
+        self.fh.setFormatter(self.formatter)
+
+        self.logger.addHandler(self.fh)
 
     def set_log_level(self,level):
         self.logger.setLevel(level)
@@ -26,7 +40,9 @@ class Logger:
 
 if __name__ == '__main__':
     log = Logger('Example')
-    log.set_log_level(logging.DEBUG)
+    log.set_log_level(logging.ERROR)
+    #file_name = "D:\config\log\{}".format('test.log')
+    #log.set_log_file(logging.INFO,file_name)
     log.log_debug('debug info')
     log.log_info('info')
     log.log_warning('warning info')

@@ -1,21 +1,25 @@
 #!/usr/bin/env python
 
 
-
-import time
 try:
     from app.Logger import *
 except Exception as e:
     from Logger import *
 
+import pandas as pd
+import datetime
 
+class A:
+    def __init__(self):
+        print('A')
+
+class B(A):
+    def __init__(self):
+        super(B,self).__init__()
+        print("B")
 
 if __name__ == '__main__':
-     log= logging.getLogger('test')
-
-     log.debug('debug info')
-     log.info('info')
-     log.warning('warning info')
-     time.sleep(5)
-     log.error('error info')
+    b = B()
+    time = datetime.datetime.now()
+    print(time)
 

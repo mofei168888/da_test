@@ -10,7 +10,6 @@ import urllib.request
 import requests
 import math
 import platform
-import numpy as np
 import json
 
 try:
