@@ -5,6 +5,7 @@ try:
     from app.trade_base import *
 except Exception as e:
     from trade_base import *
+import datetime
 
 class zzsd_strategy(Trade_Base):
 
@@ -153,7 +154,7 @@ class zzsd_strategy(Trade_Base):
 if __name__== '__main__':
     zs = zzsd_strategy('params.json')
     zs.set_log_file(logging.DEBUG,'20180205.log')
-    zs.set_LogLevel(logging.ERROR)
+    zs.set_LogLevel(logging.WARNING)
     while True:
         signal = zs.get_kc_signal('5min',6)
         zs._log.log_info('开仓交易信号:%s'%signal)
