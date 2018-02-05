@@ -140,7 +140,7 @@ class zzsd_strategy(Trade_Base):
 
         if self._depth_price['sell'] - self._user_cost['sell_cost'] >self._params['lose'] and self._user_pos['sell_amount']!=0:
            self._log.log_info('做空开仓价格:%s,平仓价格:%s,百分比:%s'%(self._user_pos['sell_cost'],self._depth_price['sell'],
-                                                                (self._user_pos['sell_cost']-self._depth_price['sell'])/self._user_pos['sell_cost'] *100*20))
+                                                                (self._depth_price['sell']-self._user_pos['sell_cost'])/self._user_pos['sell_cost'] *100*20))
            signal = -1  # 发出做空平仓信号
 
         return signal
