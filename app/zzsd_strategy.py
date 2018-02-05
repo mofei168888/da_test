@@ -63,7 +63,7 @@ class zzsd_strategy(Trade_Base):
         depth_price = self.get_price_depth()
         if depth_price['status']:
             self._depth_price = depth_price
-            self._log.log_info('交易深度:%s'%self._depth_price)
+            self._log.log_debug('交易深度:%s'%self._depth_price)
 
         #------获取K线数据-------#
         price_box = self.get_price_box(period, nums)
@@ -75,9 +75,8 @@ class zzsd_strategy(Trade_Base):
             price_box['skew'] = dif_data['dif'].skew() # 获取K线涨跌幅偏度
             price_box['kurt'] = dif_data['dif'].kurt() # 获取K线涨跌幅峰度
             self._kline_data = price_box
-            self._log.log_debug(self._kline_data)
-            self._log.log_info('箱体高点:%s,箱体低点:%s' % (self._kline_data['high'], self._kline_data['low']))
-            self._log.log_info("K线平均值:%s,标准差:%s,偏度:%s,峰度:%s" % (self._kline_data['mean'], self._kline_data['std'], self._kline_data['skew'], self._kline_data['kurt']))
+            self._log.log_debug('箱体高点:%s,箱体低点:%s' % (self._kline_data['high'], self._kline_data['low']))
+            self._log.log_debug("K线平均值:%s,标准差:%s,偏度:%s,峰度:%s" % (self._kline_data['mean'], self._kline_data['std'], self._kline_data['skew'], self._kline_data['kurt']))
         #----获取用户持仓数据--------#
         user_pos = self.get_user_position()
         if user_pos['status']:
@@ -94,7 +93,7 @@ class zzsd_strategy(Trade_Base):
                 sell_price.append(self._user_cost['sell_cost'])
                 if len(sell_price) == 2:
                     self._user_cost['sell_cost'] = np.amin(sell_price)  # 更新成本价格
-                    self._log.log_info(self._user_cost)
+                    self._log.log_debug(self._user_cost)
 
     #--------------------------交易模型--------------------------------#
     def get_kc_signal(self,period,nums):
@@ -111,7 +110,7 @@ class zzsd_strategy(Trade_Base):
         self.get_updated_price(period,nums)
         #------------执行计算------------------#
         if self._kline_data and self._depth_price and self._user_pos:#获取箱体价格,交易深度价格,用户持仓数据
-            if abs(self._kline_data['mean'])< 1 and self._kline_data['std'] <4 and self._kline_data['kurt'] <2:   #表示行情稳定，稳定下的突破才是有效的突破
+            if abs(self._kline_data['mean'])< 1 and self._kline_data['std'] <5 and self._kline_data['kurt'] <2:   #表示行情稳定，稳定下的突破才是有效的突破
                 if self._depth_price['buy'] - self._kline_data['high'] > self._params['point'] and self._user_pos['buy_amount']==0:#价格向上突破箱体，并且没有持仓
                     signal = 1
                 elif self._kline_data['low'] - self._depth_price['sell'] > self._params['point'] and self._user_pos['sell_amount']==0:#价格向下突破箱体，并且没有持仓
@@ -159,8 +158,10 @@ if __name__== '__main__':
     zs.set_log_file(logging.INFO,'20180205.log')
     zs.set_LogLevel(logging.INFO)
     while True:
-        signal = zs.get_kc_signal('5min',6)
-        zs._log.log_info('开仓交易信号:%s'%signal)
-        signal = zs.get_pc_signal('5min',6)
-        zs._log.log_info('平仓交易信号:%s'%signal)
+        try:
+            zs.trade_kc('5min',6)
+            zs.trade_pc('5min',6)
+        except Exception as e:
+            print('发生异常错误:%s'%e)
+
 
