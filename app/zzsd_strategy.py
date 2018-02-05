@@ -110,7 +110,7 @@ class zzsd_strategy(Trade_Base):
         self.get_updated_price(period,nums)
         #------------执行计算------------------#
         if self._kline_data and self._depth_price and self._user_pos:#获取箱体价格,交易深度价格,用户持仓数据
-            if abs(self._kline_data['mean'])< self._params['mean']:   #表示行情稳定，稳定下的突破才是有效的突破
+            if abs(self._kline_data['mean'])< self._params['mean']  and self._kline_data['std'] < self._params['std'] and self._kline_data['kurt'] < self._params['kurt']:   #表示行情稳定，稳定下的突破才是有效的突破
                 if self._depth_price['buy'] - self._kline_data['high'] > self._params['point'] and self._user_pos['buy_amount']==0:#价格向上突破箱体，并且没有持仓
                     signal = 1
                 elif self._kline_data['low'] - self._depth_price['sell'] > self._params['point'] and self._user_pos['sell_amount']==0:#价格向下突破箱体，并且没有持仓
@@ -165,5 +165,6 @@ if __name__== '__main__':
             zs.trade_pc('1min',30)
         except Exception as e:
             zs._log.log_error('发生异常:%s'%e)
+
 
 
