@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
+import datetime
+
 try:
     from app.trade_base import *
 except Exception as e:
     from trade_base import *
-import datetime
 
 class zzsd_strategy(Trade_Base):
 
@@ -22,7 +24,7 @@ class zzsd_strategy(Trade_Base):
         user_pos = self.get_user_position()
         if user_pos['status']:
             self._user_pos = user_pos
-            self._log.log_debug(self._user_pos)
+            self._log.log_info(self._user_pos)
             if self._user_pos['buy_amount'] > 0:
                 self._user_cost['buy_cost'] = self._user_pos['buy_cost']
             else:
@@ -32,7 +34,7 @@ class zzsd_strategy(Trade_Base):
                 self._user_cost['sell_cost'] = self._user_pos['sell_cost']
             else:
                 self._user_cost['sell_cost'] = 1000000.0000  # 给一个很大的值
-            self._log.log_debug('用户持仓成本:%s' % self._user_cost)
+            self._log.log_info('用户持仓成本:%s' % self._user_cost)
 
     def get_price_box(self, period, nums):
         '''
@@ -61,7 +63,7 @@ class zzsd_strategy(Trade_Base):
         depth_price = self.get_price_depth()
         if depth_price['status']:
             self._depth_price = depth_price
-            self._log.log_debug(self._depth_price)
+            self._log.log_info('交易深度:%s'%self._depth_price)
 
         #------获取K线数据-------#
         price_box = self.get_price_box(period, nums)
@@ -74,7 +76,8 @@ class zzsd_strategy(Trade_Base):
             price_box['kurt'] = dif_data['dif'].kurt() # 获取K线涨跌幅峰度
             self._kline_data = price_box
             self._log.log_debug(self._kline_data)
-            self._log.log_debug("K线平均值:%s,标准差:%s,偏度:%s,峰度:%s" % (self._kline_data['mean'], self._kline_data['std'], self._kline_data['skew'], self._kline_data['kurt']))
+            self._log.log_info('箱体高点:%s,箱体低点:%s' % (self._kline_data['high'], self._kline_data['low']))
+            self._log.log_info("K线平均值:%s,标准差:%s,偏度:%s,峰度:%s" % (self._kline_data['mean'], self._kline_data['std'], self._kline_data['skew'], self._kline_data['kurt']))
         #----获取用户持仓数据--------#
         user_pos = self.get_user_position()
         if user_pos['status']:
@@ -91,7 +94,7 @@ class zzsd_strategy(Trade_Base):
                 sell_price.append(self._user_cost['sell_cost'])
                 if len(sell_price) == 2:
                     self._user_cost['sell_cost'] = np.amin(sell_price)  # 更新成本价格
-            self._log.log_debug(self._user_cost)
+                    self._log.log_info(self._user_cost)
 
     #--------------------------交易模型--------------------------------#
     def get_kc_signal(self,period,nums):
@@ -153,8 +156,8 @@ class zzsd_strategy(Trade_Base):
 
 if __name__== '__main__':
     zs = zzsd_strategy('params.json')
-    zs.set_log_file(logging.DEBUG,'20180205.log')
-    zs.set_LogLevel(logging.WARNING)
+    zs.set_log_file(logging.INFO,'20180205.log')
+    zs.set_LogLevel(logging.INFO)
     while True:
         signal = zs.get_kc_signal('5min',6)
         zs._log.log_info('开仓交易信号:%s'%signal)
