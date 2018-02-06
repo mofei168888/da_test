@@ -120,7 +120,6 @@ class zzsd_strategy(Trade_Base):
 
     def set_profit_win(self,period,nums):
         orders = {}
-        self.get_updated_price(period, nums)
         if self._user_pos['buy_available']>0:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PD'],
                                         order_price=self._user_pos['buy_cost']+self._params['profit'],
