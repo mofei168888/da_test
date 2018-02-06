@@ -132,7 +132,6 @@ class zzsd_strategy(Trade_Base):
 
     def trade_pc(self,period,nums):
         orders = {}
-        self.set_profit_win()
         signal = self.get_pc_signal(period,nums)
         if signal == 1:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PD'], order_price=0, match_price=1,cancel_ys=True)
@@ -152,6 +151,7 @@ if __name__== '__main__':
     while True:
         try:
             zs.trade_kc(period,nums)
+            zs.set_profit_win()
             zs.trade_pc(period,nums)
         except Exception as e:
             zs._log.log_error('发生异常:%s'%e)
