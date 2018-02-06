@@ -207,7 +207,7 @@ class Trade_Base:
                    cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
                    if cancel_order:  # 撤销订单成功
                        self._log.log_debug('订单撤销成功:%s' % cancel_order)
-                       time.sleep(30)
+
         kc_order = self._OKServices.send_future_order(symbol=self._params['symbol'], type=order_type,
                                                                       match_price=match_price,
                                                                       price=order_price,
