@@ -193,6 +193,7 @@ class Trade_Base:
                 if pc_order:
                     orders = pc_order
                     self._log.log_debug('平仓订单已下单%s：%s' %(match_price, pc_order))
+                    time.sleep(10)
 
         return orders
 

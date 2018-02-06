@@ -135,10 +135,8 @@ class zzsd_strategy(Trade_Base):
         signal = self.get_pc_signal(period,nums)
         if signal == 1:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PD'], order_price=0, match_price=1,cancel_ys=True)
-            time.sleep(5)
         if signal == -1:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PK'], order_price=0, match_price=1,cancel_ys=True)
-            time.sleep(5)
         return orders
 
 if __name__== '__main__':
