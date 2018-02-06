@@ -34,7 +34,7 @@ class zzsd_strategy(Trade_Base):
         price_box = {}
         kline = self.get_kline(period, nums)
         if kline['status']:
-            pl = pd.concat([kline['data']['open'][1:], kline['data']['close'][1:]], axis=0)
+            pl = pd.concat([kline['data']['high'][1:], kline['data']['low'][1:]], axis=0)
             price_box['high'] = float("%.04f" % pl.max())
             price_box['low'] = float("%.04f" % pl.min())
 
