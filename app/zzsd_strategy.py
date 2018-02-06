@@ -118,8 +118,9 @@ class zzsd_strategy(Trade_Base):
 
         return signal
 
-    def set_profit_win(self):
+    def set_profit_win(self,period,nums):
         orders = {}
+        self.get_updated_price(period, nums)
         if self._user_pos['buy_available']>0:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PD'],
                                         order_price=self._user_pos['buy_cost']+self._params['profit'],
@@ -135,10 +136,10 @@ class zzsd_strategy(Trade_Base):
         signal = self.get_pc_signal(period,nums)
         if signal == 1:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PD'], order_price=0, match_price=1,cancel_ys=True)
-            time.sleep(60)
+            time.sleep(5)
         if signal == -1:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PK'], order_price=0, match_price=1,cancel_ys=True)
-            time.sleep(60)
+            time.sleep(5)
         return orders
 
 if __name__== '__main__':
@@ -151,7 +152,7 @@ if __name__== '__main__':
     while True:
         try:
             zs.trade_kc(period,nums)
-            zs.set_profit_win()  #增加止赢
+            zs.set_profit_win(period,nums) #增加止赢
             zs.trade_pc(period,nums)
         except Exception as e:
             zs._log.log_error('发生异常:%s'%e)
