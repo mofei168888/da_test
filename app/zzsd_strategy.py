@@ -135,12 +135,12 @@ class zzsd_strategy(Trade_Base):
         #if abs(self._kline_data['mean']) < 2 and self._kline_data['std'] < 5 and self._kline_data['kurt'] < 2:
         if self._user_cost['buy_cost'] - self._depth_price['buy'] > self._params['lose'] and self._user_pos['buy_amount']!=0:
            self._log.log_info('做多开仓价格:%s,平仓价格:%s,百分比;%s' % (self._user_pos['buy_cost'], self._depth_price['buy'],
-                                                                  (self._user_pos['buy_cost']-self._depth_price['buy'])/self._user_pos['buy_cost'] *100*20))
+                                                                  (self._depth_price['buy']-self._user_pos['buy_cost'])/self._user_pos['buy_cost'] *100*20))
            signal = 1 #发出做多平仓信号
 
         if self._depth_price['sell'] - self._user_cost['sell_cost'] >self._params['lose'] and self._user_pos['sell_amount']!=0:
            self._log.log_info('做空开仓价格:%s,平仓价格:%s,百分比:%s'%(self._user_pos['sell_cost'],self._depth_price['sell'],
-                                                                (self._depth_price['sell']-self._user_pos['sell_cost'])/self._user_pos['sell_cost'] *100*20))
+                                                                (self._user_pos['sell_cost']-self._depth_price['sell'])/self._user_pos['sell_cost'] *100*20))
            signal = -1  # 发出做空平仓信号
 
         return signal
