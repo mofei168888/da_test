@@ -180,7 +180,7 @@ class Trade_Base:
                         cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
                         if cancel_order:  # 撤销订单成功 #执行移动止损，将止损挂单价格向上移动
                             self._log.log_debug('订单撤销成功:%s'%cancel_order)
-                            time.sleep(20)
+
             if order_type==OK_ORDER_TYPE['PD']:
                 pc_qty = user_pos['buy_available']
 
