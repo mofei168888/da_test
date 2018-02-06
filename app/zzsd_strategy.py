@@ -157,7 +157,7 @@ class zzsd_strategy(Trade_Base):
 
 if __name__== '__main__':
     zs = zzsd_strategy('params.json')
-    zs.set_log_file(logging.INFO,'20180205.log')
+    zs.set_log_file(logging.INFO,'20180206.log')
     zs.set_LogLevel(logging.INFO)
     while True:
         try:
