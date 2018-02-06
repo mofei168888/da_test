@@ -19,22 +19,10 @@ class zzsd_strategy(Trade_Base):
         self._depth_price = {}
         self._kline_data = {}
         #-----------------------------------------#
-        self._user_cost = {}
 
         user_pos = self.get_user_position()
         if user_pos['status']:
             self._user_pos = user_pos
-            self._log.log_info(self._user_pos)
-            if self._user_pos['buy_amount'] > 0:
-                self._user_cost['buy_cost'] = self._user_pos['buy_cost']
-            else:
-                self._user_cost['buy_cost'] = 0.0000
-
-            if self._user_pos['sell_amount'] > 0:
-                self._user_cost['sell_cost'] = self._user_pos['sell_cost']
-            else:
-                self._user_cost['sell_cost'] = 1000000.0000  # 给一个很大的值
-            self._log.log_info('用户持仓成本:%s' % self._user_cost)
 
     def get_price_box(self, period, nums):
         '''
@@ -81,19 +69,6 @@ class zzsd_strategy(Trade_Base):
         user_pos = self.get_user_position()
         if user_pos['status']:
             self._user_pos = user_pos
-            if self._user_pos['buy_amount'] > 0:  # 拥有做多持仓，然后再更新成本信息
-                buy_price = []
-                buy_price.append(self._depth_price['buy'])
-                buy_price.append(self._user_cost['buy_cost'])
-                if len(buy_price) == 2:
-                    self._user_cost['buy_cost'] = np.amax(buy_price)  # 更新成本价格
-            if self._user_pos['sell_amount'] > 0:  # 拥有做空持仓，然后再更新成本信息
-                sell_price = []
-                sell_price.append(self._depth_price['sell'])
-                sell_price.append(self._user_cost['sell_cost'])
-                if len(sell_price) == 2:
-                    self._user_cost['sell_cost'] = np.amin(sell_price)  # 更新成本价格
-                    self._log.log_debug(self._user_cost)
 
     #--------------------------交易模型--------------------------------#
     def get_kc_signal(self,period,nums):
