@@ -155,7 +155,6 @@ class zzsd_strategy(Trade_Base):
                                         match_price=0, cancel_ys=False)
         return orders
 
-
     def trade_pc(self,period,nums):
         orders = {}
         self.set_profit_win()

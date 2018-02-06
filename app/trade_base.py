@@ -179,7 +179,7 @@ class Trade_Base:
                         self._log.log_debug(order)
                         cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
                         if cancel_order:  # 撤销订单成功 #执行移动止损，将止损挂单价格向上移动
-                            self._log.log_info('订单撤销成功:%s'%cancel_order)
+                            self._log.log_debug('订单撤销成功:%s'%cancel_order)
 
             if order_type==OK_ORDER_TYPE['PD']:
                 pc_qty = user_pos['buy_available']
@@ -192,7 +192,7 @@ class Trade_Base:
                                                                       price=order_price,amount=pc_qty)
                 if pc_order:
                     orders = pc_order
-                    self._log.log_info('平仓订单已下单%s：%s' %(match_price, pc_order))
+                    self._log.log_debug('平仓订单已下单%s：%s' %(match_price, pc_order))
 
         return orders
 
@@ -205,7 +205,7 @@ class Trade_Base:
                    self._log.log_debug(order)
                    cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
                    if cancel_order:  # 撤销订单成功
-                      self._log.log_info('订单撤销成功:%s' % cancel_order)
+                       self._log.log_debug('订单撤销成功:%s' % cancel_order)
 
         kc_order = self._OKServices.send_future_order(symbol=self._params['symbol'], type=order_type,
                                                                       match_price=match_price,
@@ -213,7 +213,7 @@ class Trade_Base:
                                                                       amount=self._params['amount'])
         if kc_order:
             orders = kc_order
-            self._log.log_info('开仓订单已下单%s：%s' % (match_price, kc_order))
+            self._log.log_debug('开仓订单已下单%s：%s' % (match_price, kc_order))
 
 
         return orders
