@@ -145,7 +145,7 @@ if __name__== '__main__':
     zs = zzsd_strategy('params.json')
     logfile = datetime.datetime.now().strftime('%Y%m%d%H%M')
     zs.set_log_file(logging.INFO,logfile+'.log')
-    zs.set_LogLevel(logging.INFO)
+    zs.set_LogLevel(logging.ERROR)
     period = zs._params['period']
     nums = zs._params['p_nums']
     while True:
