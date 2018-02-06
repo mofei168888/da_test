@@ -151,7 +151,7 @@ if __name__== '__main__':
     while True:
         try:
             zs.trade_kc(period,nums)
-            zs.set_profit_win()
+            zs.set_profit_win()  #增加止赢
             zs.trade_pc(period,nums)
         except Exception as e:
             zs._log.log_error('发生异常:%s'%e)
