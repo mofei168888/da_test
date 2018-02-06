@@ -215,7 +215,7 @@ class Trade_Base:
         if kc_order:
             orders = kc_order
             self._log.log_debug('开仓订单已下单%s：%s' % (match_price, kc_order))
-
+            time.sleep(20)
 
         return orders
 
