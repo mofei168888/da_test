@@ -131,14 +131,14 @@ class zzsd_strategy(Trade_Base):
         signal = self.get_pc_signal(period,nums)
         if signal == 1:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PD'], order_price=0, match_price=1,cancel_ys=True)
-            if orders['result']:
+            if orders:
                 self._log.log_info('做多开仓价格:%s,平仓价格:%s,百分比;%s' % (self._user_pos['buy_cost'], self._depth_price['buy'],
                                                                  (self._depth_price['buy'] - self._user_pos[
                                                                      'buy_cost']) / self._user_pos[
                                                                      'buy_cost'] * 100 * 20))
         if signal == -1:
             orders = self.send_pc_order(order_type=OK_ORDER_TYPE['PK'], order_price=0, match_price=1,cancel_ys=True)
-            if orders['result']:
+            if orders:
                 self._log.log_info('做空开仓价格:%s,平仓价格:%s,百分比:%s' % (self._user_pos['sell_cost'], self._depth_price['sell'],
                                                                  (self._user_pos['sell_cost'] - self._depth_price[
                                                                      'sell']) / self._user_pos['sell_cost'] * 100 * 20))
