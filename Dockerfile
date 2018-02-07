@@ -4,8 +4,6 @@ MAINTAINER Robin<robin.chen@b-uxin.com>
 
 ENV LANG C.UTF-8
 
-ENV CATALINA_HOME /usr/local/tomcat
-
 #设置时区,与主机保持一致
 
 RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
