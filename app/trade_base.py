@@ -80,8 +80,7 @@ class Trade_Base:
         result = {}
         result['status'] = False
         hold = self._OKServices.get_future_position(self._params['symbol'], contract_type)
-        # print(hold)
-        if hold:
+        if len(hold['holding']):
             result['buy_amount'] = hold['holding'][0]['buy_amount']
             result['buy_available'] = hold['holding'][0]['buy_available']
             result['buy_cost'] = hold['holding'][0]['buy_price_cost']
