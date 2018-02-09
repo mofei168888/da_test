@@ -3,7 +3,6 @@
 
 
 import datetime
-
 try:
     from app.trade_base import *
 except Exception as e:
@@ -144,20 +143,35 @@ class zzsd_strategy(Trade_Base):
                                                                      'sell']) / self._user_pos['sell_cost'] * 100 * 20))
         return orders
 
-if __name__== '__main__':
+def main():
     zs = zzsd_strategy('params.json')
     logfile = datetime.datetime.now().strftime('%Y%m%d%H%M')
-    zs.set_log_file(logging.INFO,logfile+'.log')
+    zs.set_log_file(logging.INFO, logfile + '.log')
     zs.set_LogLevel(logging.ERROR)
     period = zs._params['period']
     nums = zs._params['p_nums']
+    waitingFlag = False
+    # --------------------------星期五下午2点后，暂停执行，到交割之后，重新执行--------#
     while True:
-        try:
-            zs.trade_kc(period,nums)
-            zs.set_profit_win(period,nums) #增加止赢
-            zs.trade_pc(period,nums)
-        except Exception as e:
-            zs._log.log_error('发生异常:%s'%e)
+        dt = datetime.datetime.now()
+        friday = dt.strftime('%w')
+        time = dt.strftime('%H%M')
+        if int(friday) == 5 and int(time) < 1700 and int(time) > 1400:  # 表示星期五,下午2点,暂停5点开始执行
+            waitingFlag =True
+        else:
+            waitingFlag = False
+        #-----------------------------------------------------------------------------#
+        while waitingFlag==False: #
+            try:
+                zs.trade_kc(period, nums)
+                zs.set_profit_win(period, nums)  # 增加止赢
+                zs.trade_pc(period, nums)
+            except Exception as e:
+                zs._log.log_error('发生异常:%s' % e)
+
+if __name__== '__main__':
+    main()
+
 
 
 
