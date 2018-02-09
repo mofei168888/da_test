@@ -175,12 +175,13 @@ class Trade_Base:
             wt_orders = self.get_wt_orders()
             if order_type in wt_orders['type_list'] and cancel_ys:  # 有委托订单，并且执行撤销
                 for order in wt_orders['orders']:
-                    if order['type'] == order_type:  # 表示平多未成交，摊销未成交订单
+                    if order['type'] == order_type:
                         self._log.log_debug(order)
                         cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
                         if cancel_order:  # 撤销订单成功 #执行移动止损，将止损挂单价格向上移动
                             self._log.log_debug('订单撤销成功:%s'%cancel_order)
-                            time.sleep(5) #等待5秒,让撤销订单执行成功
+                            time.sleep(30) #等待5秒,让撤销订单执行成功
+
             if order_type==OK_ORDER_TYPE['PD']:
                 pc_qty = user_pos['buy_available']
 
