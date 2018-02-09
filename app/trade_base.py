@@ -172,22 +172,15 @@ class Trade_Base:
         user_pos = self.get_user_position()
         pc_qty = 0
         if user_pos['status']:
-            wt_orders = self.get_wt_orders()
-            if order_type in wt_orders['type_list'] and cancel_ys:  # 有委托订单，并且执行撤销
-                for order in wt_orders['orders']:
-                    if order['type'] == order_type:
-                        self._log.log_debug(order)
-                        cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
-                        if cancel_order:  # 撤销订单成功 #执行移动止损，将止损挂单价格向上移动
-                            self._log.log_debug('订单撤销成功:%s'%cancel_order)
-                            time.sleep(30) #等待5秒,让撤销订单执行成功
+            if  cancel_ys:
+                self.cancel_orders(order_type)
 
-            if order_type==OK_ORDER_TYPE['PD']:
-                pc_qty = user_pos['buy_available']
-
-            elif order_type==OK_ORDER_TYPE['PK']:
-                pc_qty = user_pos['sell_available']
-
+            up = self.get_user_position()#重新获取一次用户持仓
+            if up['status']:
+                if order_type==OK_ORDER_TYPE['PD']:
+                    pc_qty = up['buy_available']
+                elif order_type==OK_ORDER_TYPE['PK']:
+                    pc_qty = up['sell_available']
             if pc_qty>0:
                 pc_order = self._OKServices.send_future_order(symbol=self._params['symbol'],type=order_type,match_price=match_price,
                                                                       price=order_price,amount=pc_qty)
@@ -200,14 +193,8 @@ class Trade_Base:
 
     def send_kc_order(self,order_type,order_price,match_price=0,cancel_ys=False):
         orders = {}
-        wt_orders = self.get_wt_orders()
-        if order_type in wt_orders['type_list'] and cancel_ys:  # 有委托订单，并且执行撤销
-            for order in wt_orders['orders']:
-                if order['type'] == order_type:  # 表示开仓订单未成交，摊销未成交订单
-                   self._log.log_debug(order)
-                   cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
-                   if cancel_order:  # 撤销订单成功
-                       self._log.log_debug('订单撤销成功:%s' % cancel_order)
+        if cancel_ys:
+            self.cancel_orders(order_type)
 
         kc_order = self._OKServices.send_future_order(symbol=self._params['symbol'], type=order_type,
                                                                       match_price=match_price,
@@ -220,17 +207,20 @@ class Trade_Base:
 
         return orders
 
-    def cancel_orders(self,order_type):
+    def cancel_orders(self,order_type,retry_time =3):
         orders=[]
+        status = False
         wt_orders = self.get_wt_orders()
         if order_type in wt_orders['type_list']:  # 有委托订单，并且执行撤销
             for order in wt_orders['orders']:
                 if order['type'] == order_type:  # 表示平多未成交，摊销未成交订单
-                    self._log.log_debug(order)
-                    cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
-                    if cancel_order:  # 撤销订单成功 #执行移动止损，将止损挂单价格向上移动
-                        orders.append(cancel_order)
-                        self._log.log_info('订单撤销成功:%s' % cancel_order)
+                    while retry_time>0 and status==False:
+                        cancel_order = self._OKServices.cancel_future_order(self._params['symbol'], order['order_id'])
+                        retry_time = retry_time - 1
+                        if cancel_order['result']:  # 撤销订单成功 #执行移动止损，将止损挂单价格向上移动
+                            orders.append(cancel_order)
+                            self._log.log_info('订单撤销成功:%s' % cancel_order)
+                            status = cancel_order['result']
 
         return orders
 
@@ -248,11 +238,11 @@ class Trade_Base:
 
         return dif_df
 
-
-
 if __name__ == '__main__':
     tb = Trade_Base('ma_trade.json')
-    tb.set_log_file(logging.WARNING,'20180201.log')
+    #tb.set_log_file(logging.WARNING,'20180201.log')
+    order = tb.send_pc_order(order_type=OK_ORDER_TYPE['PD'],order_price=0,match_price=1,cancel_ys=True)
+    #print(order)
 
 
 
